@@ -8,6 +8,7 @@
 #include <numeric>
 #include <cmath>
 #include <sstream>
+#include <iomanip>
 
 ////TODO look into the constructor reference thing
 
@@ -155,6 +156,7 @@ private:
 
 using Value = std::variant<std::string, long double, void*, bool>;
 const auto epsilon = std::numeric_limits<long double>::epsilon();
+const auto maxPrecision = std::numeric_limits<long double>::digits10 + 1;
 
 class RuntimeError : std::exception {
 private:
@@ -214,9 +216,8 @@ private:
 		if (isNix(value)) return "nix";
 		if (isNum(value)) {
 			std::stringstream ss;
-			ss << std::get<long double>(value);
-			auto str = ss.str();
-			return str.ends_with(".0") ? str.substr(0, str.length()-2): str;
+			ss << std::setprecision(maxPrecision) << std::get<long double>(value);
+			return ss.str();
 		}
 		if (isStr(value)) {
 			return "\"" + std::get<std::string>(value) + "\"";

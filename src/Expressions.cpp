@@ -9,7 +9,7 @@ Interpreter& Interpreter::getInstance() {
 void Interpreter::interpret(Expr_ptr expr) {
 	try {
 		expr->accept(this);
-		std::cout << stringify(m_val) << '\n';
+		std::cout << std::setprecision(maxPrecision) << stringify(m_val) << '\n';
 	}
 	catch (const RuntimeError& err) {
 		Proto::getInstance().runtimeError(err);

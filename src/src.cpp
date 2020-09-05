@@ -10,7 +10,7 @@
 void repl(Proto& proto) {
     std::string line;
 
-    while (std::cout << "> ", std::getline(std::cin, line)) {
+    while (std::cout << "proto> ", std::getline(std::cin, line)) {
         proto.run(line);
         proto.setErr(false); //set error to false for each repl thingy
         std::cout << '\n'; //print a new line before repeating
