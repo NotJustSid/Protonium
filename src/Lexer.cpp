@@ -158,10 +158,10 @@ void Lexer::scanToken(Proto& p) {
         addToken(isNext('=') ? TokenType::EQ_EQUAL : TokenType::EQUAL);
         break;
     case '>':
-        addToken(isNext('=') ? TokenType::GT_EQUAL : TokenType::EQUAL);
+        addToken(isNext('=') ? TokenType::GT_EQUAL : TokenType::GREATER);
         break;
     case '<':
-        addToken(isNext('=') ? TokenType::LT_EQUAL : TokenType::EQUAL);
+        addToken(isNext('=') ? TokenType::LT_EQUAL : TokenType::LESS);
         break;
     case '/':
         if (isNext('/')) { 
