@@ -218,7 +218,12 @@ private:
 			auto str = ss.str();
 			return str.ends_with(".0") ? str.substr(0, str.length()-2): str;
 		}
-		return "\"" + std::get<std::string>(value) + "\"";
+		if (isStr(value)) {
+			return "\"" + std::get<std::string>(value) + "\"";
+		}
+		if (isBool(value)) {
+			return std::get<bool>(value) ? "true" : "false";
+		}
 	}
 
 	Interpreter() = default;
