@@ -74,9 +74,11 @@ public:
 	}
 };
 
+using Value = std::variant<std::string, long double, void*, bool>;
+
 class Literal : public Expr {
 public:
-	std::variant<std::string, long double, void*, bool> m_val;
+	Value m_val;
 	LiteralType m_literalType;
 public:
 	Literal(Token literal) : m_literalType(literal.getlType()){

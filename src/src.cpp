@@ -7,10 +7,14 @@
 
 #include "proto.hpp"
 
+#include "dep/rang.hpp"
+
+using namespace rang;
+
 void repl(Proto& proto) {
     std::string line;
 
-    while (std::cout << "proto> ", std::getline(std::cin, line)) {
+    while (std::cout << fgB::green <<"proto> " << fg::reset << style::reset, std::getline(std::cin, line)) {
         proto.run(line);
         proto.setErr(false); //set error to false for each repl thingy
         std::cout << '\n'; //print a new line before repeating

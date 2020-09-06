@@ -6,6 +6,8 @@
 #include "includes/Lexer.hpp"
 #include "includes/Parser.hpp"
 
+#include "dep/rang.hpp"
+
 Proto& Proto::getInstance() {
     static Proto proto;
     return proto;
@@ -18,18 +20,8 @@ void Proto::run(std::string src) {
     auto parsedExpr = parser.parse();
 
     if (hadError()) return; //stop if there was an error
-    
-    //For now, print the AST
-    /*TreePrinter printer;
-    std::cout <<  printer.tree(*parsedExpr);*/
 
     Interpreter::getInstance().interpret(parsedExpr);
-
-    ////For now, print the tokens
-    //Those were the days when I just had a lexer
-    /*for (auto token : tokens) {
-        std::cout << token << " ";
-    }*/
 }
 
 void Proto::runFile(std::string_view path) {
@@ -71,11 +63,13 @@ bool Proto::hadRuntimeError() const {
     return m_hitRuntimeError;
 }
 
+using namespace rang;
+
 void Proto::error(std::size_t line, std::string_view msg, std::string snippet) {
-    std::cerr << "[ERR Line " << line << "]: " << msg << snippet << '\n';
+    std::cerr << fgB::red  << "[ERROR | Line " << line << "]: " << fg::reset << style::dim << msg << snippet << style::reset << '\n';
     setErr(true);
 }
 
 void Proto::runtimeError(const RuntimeError& error) {
-    std::cerr << "[Runtime ERR Line " << error.getToken().getLine() << "]: " << error.what() << '\n';
+    std::cerr << fgB::red << "[RUNTIME ERROR | Line " << error.getToken().getLine() << "]: " << fg::reset << style::dim << error.what() << style::reset << '\n';
 }
