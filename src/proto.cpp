@@ -5,6 +5,7 @@
 
 #include "includes/Lexer.hpp"
 #include "includes/Parser.hpp"
+#include "includes/Interpreter.hpp"
 
 #include "dep/rang.hpp"
 
@@ -17,11 +18,11 @@ void Proto::run(std::string src) {
     auto lexer = Lexer(std::move(src));
     auto& tokens = lexer.scanTokens(*this);
     auto parser = Parser(tokens);
-    auto parsedExpr = parser.parse();
+    auto statements = parser.parse();
 
     if (hadError()) return; //stop if there was an error
 
-    Interpreter::getInstance().interpret(parsedExpr);
+    Interpreter::getInstance().interpret(statements);
 }
 
 void Proto::runFile(std::string_view path) {

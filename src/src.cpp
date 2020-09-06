@@ -23,7 +23,7 @@ void repl(Proto& proto) {
 
 int main(int argc, char **argv) {
     if (argc > 2) {
-        std::cout << "Usage: proto [source]";
+        std::cout << fgB::blue << "Usage:" << fgB::green << " proto " << fg::reset << style::dim << "[source]" << style::reset;
         std::exit(EXIT_UNEXPECTED_ARGS);
     }
     else if (argc == 2) {

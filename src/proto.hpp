@@ -4,6 +4,8 @@
 
 #include "includes/Expressions.hpp"
 
+class RuntimeError;
+
 class Proto {
 private:
     bool m_hitError = false;

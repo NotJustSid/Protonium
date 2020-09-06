@@ -1,17 +1,24 @@
-#include "includes/Parser.hpp"
 #include <string_view>
+
+#include "includes/Parser.hpp"
+#include "proto.hpp"
 
 Parser::Parser(std::vector<Token>& tokens) : m_tokens(tokens), m_current(0) {
 
 }
 
-Expr_ptr Parser::parse() {
-	try {
+std::vector<Stmt_ptr> Parser::parse() {
+	std::vector<Stmt_ptr> statements;
+	/*try {
 		return expression();
 	}
 	catch (const ParseError& error) {
 		return nullptr;
+	}*/
+	while (!isAtEnd()) {
+		statements.push_back(statement());
 	}
+	return statements;
 }
 
 bool Parser::isAtEnd() {
@@ -86,6 +93,25 @@ void Parser::sync() {
 }
 
 //! Production rules
+
+Stmt_ptr Parser::statement() {
+	if (match({ TokenType::PRINT })) {
+		return printstmt();
+	}
+	return exprstmt();
+}
+
+Stmt_ptr Parser::printstmt() {
+	auto expr = expression();
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after value.");
+	return std::make_shared<Print>(expr);
+}
+
+Stmt_ptr Parser::exprstmt() {
+	auto expr = expression();
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after expression.");
+	return std::make_shared<Expression>(expr);
+}
 
 Expr_ptr Parser::expression() {
 	return equality();

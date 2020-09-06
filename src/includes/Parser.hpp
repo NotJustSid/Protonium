@@ -1,6 +1,4 @@
 #pragma once
-#include "includes/Expressions.hpp"
-#include "includes/Token.hpp"
 #include <list>
 #include <vector>
 #include <memory>
@@ -8,7 +6,9 @@
 #include <string>
 #include <string_view>
 
-#include "../proto.hpp"
+#include "includes/Expressions.hpp"
+#include "includes/Token.hpp"
+#include "Statements.hpp"
 
 class ParseError : std::exception {
 private:
@@ -30,7 +30,7 @@ private:
 public:
 	Parser() = delete;
 	Parser(std::vector<Token>& tokens);
-	Expr_ptr parse();
+	std::vector<Stmt_ptr> parse();
 private:
 //! Helpers
 
@@ -52,6 +52,9 @@ private:
 	void sync();
 
 //! Production rules
+	Stmt_ptr statement();
+	Stmt_ptr printstmt();
+	Stmt_ptr exprstmt();
 	Expr_ptr expression();
 	Expr_ptr equality();
 	Expr_ptr comparision();
