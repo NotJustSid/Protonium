@@ -55,7 +55,9 @@ private:
 	Stmt_ptr statement();
 	Stmt_ptr vardefn();
 	Stmt_ptr printstmt();
+	std::vector<Stmt_ptr> block();
 	Stmt_ptr exprstmt();
+
 	Expr_ptr expression();
 	Expr_ptr equality();
 	Expr_ptr comparision();

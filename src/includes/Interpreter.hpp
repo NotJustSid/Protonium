@@ -17,7 +17,7 @@ public:
 class Interpreter : public ExprVisitor, public StmtVisitor {
 private:
 	Value m_val;
-	Environment m_env;
+	Env_ptr m_env;	//the current environment
 private:
 	bool isNum(const Value& val);
 	bool isNix(const Value& val);
@@ -28,8 +28,11 @@ private:
 	bool isEqual(long double left, long double right);
 
 	std::string stringify(const Value& value, const char* strContainer = "");
+	void execute(Stmt_ptr stmt);
+	void executeBlock(std::vector<Stmt_ptr> stmts, Env_ptr env);
 
-	Interpreter() = default;
+
+	Interpreter();
 public:
 	static Interpreter& getInstance();
 	Interpreter(const Interpreter&) = delete;
@@ -44,7 +47,7 @@ public:
 	virtual void visit(const Print& print) override;
 	virtual void visit(const Expression& expr) override;
 	virtual void visit(const Var& stmt) override;
+	virtual void visit(const Block& block) override;
 
-	void execute(Stmt_ptr stmt);
 	void interpret(const std::vector<Stmt_ptr>& stmts);
 };

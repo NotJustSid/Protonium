@@ -23,3 +23,11 @@ Var::Var(Token name, Expr_ptr init) : m_name(name), m_initializer(init) {
 void Var::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Block::Block(std::vector<Stmt_ptr> stmts) : m_stmts(stmts) {
+
+}
+
+void Block::accept(StmtVisitor* visitor) const {
+	return visitor->visit(*this);
+}

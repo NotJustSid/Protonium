@@ -13,6 +13,10 @@ Token RuntimeError::getToken() const {
 	return m_tok;
 }
 
+Interpreter::Interpreter() {
+	m_env = std::make_shared<Environment>();
+	m_val = nullptr;
+}
 
 bool Interpreter::isNum(const Value& val) {
 	return std::holds_alternative<long double>(val);
@@ -178,7 +182,7 @@ void Interpreter::visit(const Literal& lit) {
 }
 
 void Interpreter::visit(const Variable& var) {
-	m_val = m_env.get(var.m_name);
+	m_val = m_env->get(var.m_name);
 }
 
 void Interpreter::visit(const Print& print) {
@@ -192,11 +196,34 @@ void Interpreter::visit(const Expression& expr) {
 
 void Interpreter::visit(const Var& stmt) {
 	stmt.m_initializer->accept(this);
-	m_env.define(stmt.m_name.str(), m_val);
+	m_env->define(stmt.m_name.str(), m_val);
+}
+
+void Interpreter::visit(const Block& block) {
+	executeBlock(block.m_stmts, std::make_shared<Environment>(m_env));
 }
 
 void Interpreter::execute(Stmt_ptr stmt) {
 	stmt->accept(this);
+}
+
+void Interpreter::executeBlock(std::vector<Stmt_ptr> stmts, Env_ptr env)
+{
+	Env_ptr parent = m_env;
+	
+	try {
+		m_env = env;
+
+		for (auto stmt : stmts) {
+			execute(stmt);
+		}
+
+		m_env = parent;
+	}
+	catch (const RuntimeError& err) {
+		m_env = parent;
+		Proto::getInstance().runtimeError(err);
+	}
 }
 
 void Interpreter::interpret(const std::vector<Stmt_ptr>& stmts) {

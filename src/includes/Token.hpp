@@ -33,13 +33,12 @@ enum class TokenType {
     RETURN,
     WHILE,
     FOR,
-    VAR,    //Initial versions will be dynamically typed
-    CLASS, //TODO Figure out another smaller name for class
+    CLASS,
     IF,
     ELSE,
 
     NIX,
-    EOF_    //Extra underscore cuz stdio.h #defines EOF as -1. WHY!?
+    EOF_
 };
 
 const std::unordered_map<TokenType, std::string_view> typeStr = { 
@@ -79,7 +78,6 @@ const std::unordered_map<TokenType, std::string_view> typeStr = {
     {TokenType::STRING, "STRING"},
     {TokenType::THIS, "THIS"},
     {TokenType::TRUE, "TRUE"},
-    /*{TokenType::VAR, "VAR"},*/
     {TokenType::WHILE, "WHILE"}
 };
 
@@ -90,7 +88,6 @@ const std::unordered_map<std::string, TokenType> keywords = {
     {"if", TokenType::IF},
     {"false", TokenType::FALSE},
     {"true", TokenType::TRUE},
-    /*{"var", TokenType::VAR},*/
     {"nix", TokenType::NIX},
     {"fn", TokenType::FUNCTION},
     {"for", TokenType::FOR},
@@ -111,7 +108,7 @@ enum class LiteralType {
 };
 
 const std::unordered_map<LiteralType, std::string_view> ltypeStr = {
-    {LiteralType::NONE, "NONE"},
+    {LiteralType::NONE, "NONE"},    //Not a literal
     {LiteralType::NUM, "NUM"},
     {LiteralType::STR, "STR"},
     {LiteralType::NIX, "NIX"},

@@ -80,7 +80,6 @@ void Parser::sync() {
 		case TokenType::FUNCTION:
 		case TokenType::RETURN:
 		case TokenType::PRINT:
-		case TokenType::VAR:
 			return;
 		}
 
@@ -98,6 +97,9 @@ Stmt_ptr Parser::statement() {
 		}
 		if (match({ TokenType::PRINT })) {
 			return printstmt();
+		}
+		if (match({ TokenType::LBRACE })) {
+			return std::make_shared<Block>(block());
 		}
 		return exprstmt();
 	}
@@ -121,6 +123,16 @@ Stmt_ptr Parser::printstmt() {
 	auto expr = expression();
 	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after value.");
 	return std::make_shared<Print>(expr);
+}
+
+std::vector<Stmt_ptr> Parser::block() {
+	std::vector<Stmt_ptr> statements;
+	while (!isNextType(TokenType::RBRACE) && !isAtEnd()) {
+		statements.push_back(statement());
+	}
+
+	matchWithErr(TokenType::RBRACE, "Expected a '}' at the end of the block.");
+	return statements;
 }
 
 Stmt_ptr Parser::exprstmt() {
