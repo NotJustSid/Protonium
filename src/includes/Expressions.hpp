@@ -15,6 +15,7 @@ class Binary;
 class Unary;
 class ParenGroup;
 class Literal;
+class Variable;
 
 class ExprVisitor {
 //! Note that this is just using overloading and no dynamic binding stuff
@@ -23,6 +24,7 @@ public:
 	virtual void visit(const Unary&) = 0;
 	virtual void visit(const ParenGroup&) = 0;
 	virtual void visit(const Literal&) = 0;
+	virtual void visit(const Variable&) = 0;
 };
 
 class Expr {
@@ -71,55 +73,63 @@ public:
 	virtual void accept(ExprVisitor* visitor) const override;
 };
 
-//! Visitors
-
-class TreePrinter : public ExprVisitor {
-private:
-	std::string m_repr;
+class Variable : public Expr {
 public:
-	const std::string& tree(const Expr& expr) {
-		expr.accept(this);
-		return m_repr;
-	}
-	virtual void visit(const Binary& bin) override {
-		parenthesize(bin.m_op.str(), {bin.m_left.get(), bin.m_right.get()});
-	}
-	virtual void visit(const Unary& un) override {
-		parenthesize(un.m_op.str(), { un.m_right.get() });
-	}
-	virtual void visit(const ParenGroup& group) override {
-		parenthesize("group", { group.m_enclosedExpr.get() });
-	}
-	virtual void visit(const Literal& lit) override {
-		std::stringstream ss;
-		if (lit.m_literalType == LiteralType::NUM) {
-			ss << std::get<long double>(lit.m_val);
-		}
-		if (lit.m_literalType == LiteralType::STR) {
-			ss << "\"" << std::get<std::string>(lit.m_val) << "\"";
-		}
-		if (lit.m_literalType == LiteralType::NIX) {
-			ss << "nix";
-		}
-		if (lit.m_literalType == LiteralType::TRUE) {
-			ss << "true";
-		}
-		if (lit.m_literalType == LiteralType::FALSE) {
-			ss << "false";
-		}
-		m_repr += ss.str();
-	}
-
-private:
-	void parenthesize(std::string name, std::vector<Expr*>&& exprs) {
-		m_repr += "(" + name;
-		for (auto& expr : exprs) {
-			m_repr += " ";
-			expr->accept(this);
-		}
-		m_repr += ")";
-	}
+	Token m_name;
+public:
+	Variable(Token name);
+	virtual void accept(ExprVisitor* visitor) const override;
 };
+
+//! Outdated Tree printer
+
+//class TreePrinter : public ExprVisitor {
+//private:
+//	std::string m_repr;
+//public:
+//	const std::string& tree(const Expr& expr) {
+//		expr.accept(this);
+//		return m_repr;
+//	}
+//	virtual void visit(const Binary& bin) override {
+//		parenthesize(bin.m_op.str(), {bin.m_left.get(), bin.m_right.get()});
+//	}
+//	virtual void visit(const Unary& un) override {
+//		parenthesize(un.m_op.str(), { un.m_right.get() });
+//	}
+//	virtual void visit(const ParenGroup& group) override {
+//		parenthesize("group", { group.m_enclosedExpr.get() });
+//	}
+//	virtual void visit(const Literal& lit) override {
+//		std::stringstream ss;
+//		if (lit.m_literalType == LiteralType::NUM) {
+//			ss << std::get<long double>(lit.m_val);
+//		}
+//		if (lit.m_literalType == LiteralType::STR) {
+//			ss << "\"" << std::get<std::string>(lit.m_val) << "\"";
+//		}
+//		if (lit.m_literalType == LiteralType::NIX) {
+//			ss << "nix";
+//		}
+//		if (lit.m_literalType == LiteralType::TRUE) {
+//			ss << "true";
+//		}
+//		if (lit.m_literalType == LiteralType::FALSE) {
+//			ss << "false";
+//		}
+//		m_repr += ss.str();
+//	}
+//
+//private:
+//	void parenthesize(std::string name, std::vector<Expr*>&& exprs) {
+//		m_repr += "(" + name;
+//		for (auto& expr : exprs) {
+//			m_repr += " ";
+//			expr->accept(this);
+//		}
+//		m_repr += ")";
+//	}
+//};
 
 const auto epsilon = std::numeric_limits<long double>::epsilon();
 const auto maxPrecision = std::numeric_limits<long double>::digits10 + 1;

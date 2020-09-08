@@ -53,6 +53,7 @@ private:
 
 //! Production rules
 	Stmt_ptr statement();
+	Stmt_ptr vardefn();
 	Stmt_ptr printstmt();
 	Stmt_ptr exprstmt();
 	Expr_ptr expression();

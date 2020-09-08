@@ -48,3 +48,11 @@ Literal::Literal(Token literal) : m_literalType(literal.getlType()) {
 void Literal::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Variable::Variable(Token name) : m_name(name) {
+
+}
+
+void Variable::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}

@@ -9,12 +9,6 @@ Parser::Parser(std::vector<Token>& tokens) : m_tokens(tokens), m_current(0) {
 
 std::vector<Stmt_ptr> Parser::parse() {
 	std::vector<Stmt_ptr> statements;
-	/*try {
-		return expression();
-	}
-	catch (const ParseError& error) {
-		return nullptr;
-	}*/
 	while (!isAtEnd()) {
 		statements.push_back(statement());
 	}
@@ -89,16 +83,38 @@ void Parser::sync() {
 		case TokenType::VAR:
 			return;
 		}
+
+		advance();
 	}
 }
 
 //! Production rules
 
 Stmt_ptr Parser::statement() {
-	if (match({ TokenType::PRINT })) {
-		return printstmt();
+	try {
+		if (match({ TokenType::IDENTIFIER })) {
+			if(match({TokenType::EQUAL}))
+				return vardefn();
+		}
+		if (match({ TokenType::PRINT })) {
+			return printstmt();
+		}
+		return exprstmt();
 	}
-	return exprstmt();
+	catch (const ParseError& err) {
+		sync();
+		return nullptr;
+	}
+}
+
+Stmt_ptr Parser::vardefn() {
+	auto name = m_tokens.at(m_current - 2);
+	Expr_ptr init;
+		
+	init = expression();
+
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after variable definition.");
+	return std::make_shared<Var>(name, init);
 }
 
 Stmt_ptr Parser::printstmt() {
@@ -186,6 +202,10 @@ Expr_ptr Parser::primary() {
 		auto expr = expression();
 		matchWithErr(TokenType::RPAREN, "Expected ')' after expression.");
 		return expr;
+	}
+
+	if (match({ TokenType::IDENTIFIER })) {
+		return std::make_shared<Variable>(previous());
 	}
 
 	throw error(peek(), "Expected an expression.");

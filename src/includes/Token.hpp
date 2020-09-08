@@ -79,7 +79,7 @@ const std::unordered_map<TokenType, std::string_view> typeStr = {
     {TokenType::STRING, "STRING"},
     {TokenType::THIS, "THIS"},
     {TokenType::TRUE, "TRUE"},
-    {TokenType::VAR, "VAR"},
+    /*{TokenType::VAR, "VAR"},*/
     {TokenType::WHILE, "WHILE"}
 };
 
@@ -90,7 +90,7 @@ const std::unordered_map<std::string, TokenType> keywords = {
     {"if", TokenType::IF},
     {"false", TokenType::FALSE},
     {"true", TokenType::TRUE},
-    {"var", TokenType::VAR},
+    /*{"var", TokenType::VAR},*/
     {"nix", TokenType::NIX},
     {"fn", TokenType::FUNCTION},
     {"for", TokenType::FOR},

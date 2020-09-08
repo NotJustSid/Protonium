@@ -1,12 +1,12 @@
 #include "includes/Interpreter.hpp"
 #include "proto.hpp"
 
-RuntimeError::RuntimeError(Token t, std::string_view err) : m_error(err), m_tok(t) {
+RuntimeError::RuntimeError(Token t, std::string err) : m_error(err), m_tok(t) {
 
 }
 
 const char* RuntimeError::what() const noexcept {
-	return m_error.data();
+	return m_error.c_str();
 }
 
 Token RuntimeError::getToken() const {
@@ -177,6 +177,10 @@ void Interpreter::visit(const Literal& lit) {
 	m_val = lit.m_val;
 }
 
+void Interpreter::visit(const Variable& var) {
+	m_val = m_env.get(var.m_name);
+}
+
 void Interpreter::visit(const Print& print) {
 	print.m_expr->accept(this);
 	std::cout << std::setprecision(maxPrecision) << stringify(m_val);
@@ -184,6 +188,11 @@ void Interpreter::visit(const Print& print) {
 
 void Interpreter::visit(const Expression& expr) {
 	expr.m_expr->accept(this);
+}
+
+void Interpreter::visit(const Var& stmt) {
+	stmt.m_initializer->accept(this);
+	m_env.define(stmt.m_name.str(), m_val);
 }
 
 void Interpreter::execute(Stmt_ptr stmt) {

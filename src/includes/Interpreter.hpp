@@ -1,14 +1,15 @@
 #pragma once
 #include "Expressions.hpp"
 #include "Statements.hpp"
+#include "Environment.hpp"
 
 class RuntimeError : std::exception {
 private:
-	std::string_view m_error;
+	std::string m_error;
 	Token m_tok;
 public:
 	RuntimeError() = delete;
-	RuntimeError(Token t, std::string_view err);
+	RuntimeError(Token t, std::string err);
 	virtual const char* what() const noexcept override;
 	Token getToken() const;
 };
@@ -16,6 +17,7 @@ public:
 class Interpreter : public ExprVisitor, public StmtVisitor {
 private:
 	Value m_val;
+	Environment m_env;
 private:
 	bool isNum(const Value& val);
 	bool isNix(const Value& val);
@@ -37,9 +39,11 @@ public:
 	virtual void visit(const Unary& un) override;
 	virtual void visit(const ParenGroup& group) override;
 	virtual void visit(const Literal& lit) override;
+	virtual void visit(const Variable& var) override;
 
 	virtual void visit(const Print& print) override;
 	virtual void visit(const Expression& expr) override;
+	virtual void visit(const Var& stmt) override;
 
 	void execute(Stmt_ptr stmt);
 	void interpret(const std::vector<Stmt_ptr>& stmts);
