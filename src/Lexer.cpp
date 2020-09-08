@@ -106,16 +106,18 @@ void Lexer::identifierOrKeyword() {
     if (keywords.contains(str)) {
         if (str == "nix") {
             addToken(keywords.at(str), LiteralType::NIX);
+            return;
         }
         if (str == "true") {
             addToken(keywords.at(str), LiteralType::TRUE);
+            return;
         }
         if (str == "false") {
             addToken(keywords.at(str), LiteralType::FALSE);
+            return;
         }
-        else {
-            addToken(keywords.at(str));
-        }
+        
+        addToken(keywords.at(str));
         return;
     }
     addToken(TokenType::IDENTIFIER);

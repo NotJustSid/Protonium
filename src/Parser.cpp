@@ -139,9 +139,6 @@ Expr_ptr Parser::equality() {
 	while (match({ TokenType::NOT_EQUAL, TokenType::EQ_EQUAL })) {
 		Token op = previous();
 		auto right = comparision();
-		/*auto copy = new Binary(*expr, op, *right);
-		delete expr;
-		expr = copy;*/
 		expr = std::make_shared<Binary>(expr, op, right);
 	}
 	return expr;
