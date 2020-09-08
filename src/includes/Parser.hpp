@@ -5,6 +5,7 @@
 #include <exception>
 #include <string>
 #include <string_view>
+#include <variant>
 
 #include "includes/Expressions.hpp"
 #include "includes/Token.hpp"
@@ -27,10 +28,12 @@ class Parser {
 private:
 	std::vector<Token> m_tokens;
 	std::size_t m_current;
+	bool m_allowExpr;
+	bool m_foundExpr;
 public:
 	Parser() = delete;
-	Parser(std::vector<Token>& tokens);
-	std::vector<Stmt_ptr> parse();
+	Parser(std::vector<Token>& tokens, bool parseRepl = false);
+	std::variant<Stmts, Expr_ptr> parse();
 private:
 //! Helpers
 
@@ -55,7 +58,7 @@ private:
 	Stmt_ptr statement();
 	Stmt_ptr vardefn();
 	Stmt_ptr printstmt();
-	std::vector<Stmt_ptr> block();
+	Stmts block();
 	Stmt_ptr exprstmt();
 
 	Expr_ptr expression();

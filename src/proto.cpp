@@ -14,15 +14,22 @@ Proto& Proto::getInstance() {
     return proto;
 }
 
-void Proto::run(std::string src) {
+void Proto::run(std::string src, bool allowExpr) {
     auto lexer = Lexer(std::move(src));
     auto& tokens = lexer.scanTokens(*this);
-    auto parser = Parser(tokens);
-    auto statements = parser.parse();
+    auto parser = Parser(tokens, allowExpr);
+    auto parsedOut = parser.parse();
 
     if (hadError()) return; //stop if there was an error
-
-    Interpreter::getInstance().interpret(statements);
+    if (std::holds_alternative<Stmts>(parsedOut)) {
+        Interpreter::getInstance().interpret(std::get<Stmts>(parsedOut));
+    }
+    else {
+        auto result = Interpreter::getInstance().interpret(std::get<Expr_ptr>(parsedOut));
+        if (result != "") {
+            std::cout << result << '\n';
+        }
+    }
 }
 
 void Proto::runFile(std::string_view path) {
@@ -36,11 +43,6 @@ void Proto::runFile(std::string_view path) {
     else {
         std::string src;
         std::ifstream file{ path.data() };
-        
-        //TODO look at this later
-        /*src.reserve(fs::file_size(loc));*/ 
-        //! Don't know about this; we lose information if the file size is
-        //! larger than the sizeof(unsigned int).
 
         src.assign((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
         run(src);

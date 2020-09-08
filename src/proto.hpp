@@ -15,7 +15,7 @@ public:
     static Proto& getInstance();
     Proto(const Proto&) = delete;
     void operator=(const Proto&) = delete;
-    void run(std::string src);
+    void run(std::string src, bool allowExpr = false);
     void runFile(std::string_view path);
     void setErr(bool val);
     void setRuntimeError(bool val);

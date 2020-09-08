@@ -236,3 +236,14 @@ void Interpreter::interpret(const std::vector<Stmt_ptr>& stmts) {
 		Proto::getInstance().runtimeError(err);
 	}
 }
+
+std::string Interpreter::interpret(Expr_ptr expr) {
+	try {
+		expr->accept(this);
+		return stringify(m_val, "\"");
+	}
+	catch (const RuntimeError& err) {
+		Proto::getInstance().runtimeError(err);
+		return "";
+	}
+}

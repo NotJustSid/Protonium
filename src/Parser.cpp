@@ -3,14 +3,20 @@
 #include "includes/Parser.hpp"
 #include "proto.hpp"
 
-Parser::Parser(std::vector<Token>& tokens) : m_tokens(tokens), m_current(0) {
+Parser::Parser(std::vector<Token>& tokens, bool parseRepl) : m_tokens(tokens), m_current(0), m_allowExpr(parseRepl), m_foundExpr(false){
 
 }
 
-std::vector<Stmt_ptr> Parser::parse() {
+std::variant<Stmts, Expr_ptr> Parser::parse() {
 	std::vector<Stmt_ptr> statements;
 	while (!isAtEnd()) {
 		statements.push_back(statement());
+
+		if (m_foundExpr) {
+			return std::static_pointer_cast<Expression>(statements.back())->m_expr;
+			
+		}
+		m_allowExpr = false;
 	}
 	return statements;
 }
@@ -92,8 +98,9 @@ void Parser::sync() {
 Stmt_ptr Parser::statement() {
 	try {
 		if (match({ TokenType::IDENTIFIER })) {
-			if(match({TokenType::EQUAL}))
+			if (match({ TokenType::EQUAL }))
 				return vardefn();
+			else m_current--;
 		}
 		if (match({ TokenType::PRINT })) {
 			return printstmt();
@@ -103,7 +110,7 @@ Stmt_ptr Parser::statement() {
 		}
 		return exprstmt();
 	}
-	catch (const ParseError& err) {
+	catch (const ParseError&) {
 		sync();
 		return nullptr;
 	}
@@ -121,11 +128,11 @@ Stmt_ptr Parser::vardefn() {
 
 Stmt_ptr Parser::printstmt() {
 	auto expr = expression();
-	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after value.");
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after statement.");
 	return std::make_shared<Print>(expr);
 }
 
-std::vector<Stmt_ptr> Parser::block() {
+Stmts Parser::block() {
 	std::vector<Stmt_ptr> statements;
 	while (!isNextType(TokenType::RBRACE) && !isAtEnd()) {
 		statements.push_back(statement());
@@ -137,7 +144,8 @@ std::vector<Stmt_ptr> Parser::block() {
 
 Stmt_ptr Parser::exprstmt() {
 	auto expr = expression();
-	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after expression.");
+	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
+	else matchWithErr(TokenType::SEMICOLON, "Expected a ';' after expression.");
 	return std::make_shared<Expression>(expr);
 }
 

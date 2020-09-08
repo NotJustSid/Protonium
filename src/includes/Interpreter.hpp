@@ -29,7 +29,7 @@ private:
 
 	std::string stringify(const Value& value, const char* strContainer = "");
 	void execute(Stmt_ptr stmt);
-	void executeBlock(std::vector<Stmt_ptr> stmts, Env_ptr env);
+	void executeBlock(Stmts stmts, Env_ptr env);
 
 
 	Interpreter();
@@ -50,4 +50,5 @@ public:
 	virtual void visit(const Block& block) override;
 
 	void interpret(const std::vector<Stmt_ptr>& stmts);
+	std::string interpret(Expr_ptr expr);
 };

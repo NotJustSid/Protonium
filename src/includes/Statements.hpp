@@ -20,6 +20,7 @@ public:
 };
 
 using Stmt_ptr = std::shared_ptr<Stmt>;
+using Stmts = std::vector<Stmt_ptr>;
 
 class Expression : public Stmt {
 public:
