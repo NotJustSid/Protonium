@@ -1,6 +1,8 @@
 #include "includes/Lexer.hpp"
 #include "proto.hpp"
 
+#include <algorithm>
+
 bool Lexer::isAtEnd() const {
     if (m_current >= m_src.length()) {
         return true;
@@ -18,19 +20,25 @@ void Lexer::addToken(TokenType type, LiteralType ltype) {
         //! Make the lexeme the value of the str; remove the quotes
         lexeme = lexeme.substr(1, lexeme.length() - 2);
         
-        //! Unescape escape sequences. This one is preliminary code.
-        //! Intend to use some c++ algorithms and lambdas.
-        /*for (size_t i = 0; i < lexeme.length(); i++) {
+        //! Unescape escape sequences. Only \n and \t are supported.
+        for (size_t i = 0; i < lexeme.length(); i++) {
             if (lexeme.at(i) == '\\') {
                 if (i + 1 < lexeme.length()) {
                     switch (lexeme.at(i + 1)) {
                     case 'n':
                         lexeme = lexeme.substr(0, i) + '\n' + lexeme.substr(i + 2, lexeme.length() - i - 1);
-                        case 'r'
+                        break;
+                    case 't':
+                        lexeme = lexeme.substr(0, i) + '\t' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        break;
+                    case '\\':
+                        lexeme = lexeme.substr(0, i) + '\\' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        break;
                     }
                 }
             }
-        }*/
+        }
+        
     }
     m_tokens.push_back(Token(type, lexeme, m_line, ltype));
 }
