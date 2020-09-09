@@ -56,3 +56,11 @@ Variable::Variable(Token name) : m_name(name) {
 void Variable::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Logical::Logical(Expr_ptr left, Token op, Expr_ptr right) : m_left(left), m_op(op), m_right(right) {
+
+}
+
+void Logical::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}

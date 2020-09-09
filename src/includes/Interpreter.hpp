@@ -43,11 +43,53 @@ public:
 	virtual void visit(const ParenGroup& group) override;
 	virtual void visit(const Literal& lit) override;
 	virtual void visit(const Variable& var) override;
+	virtual void visit(const Logical& log) override {
+		log.m_left->accept(this);
+
+		if (log.m_op.getType() == TokenType::OR) {
+			if (isTrue(m_val)) {
+				//the left side is true
+				m_val = true;
+			}
+			else {
+				log.m_right->accept(this);
+				if (isTrue(m_val)) {
+					//the left is false and right side is true
+					m_val = true;
+				}
+				else {
+					//both the left and right side are false
+					m_val = false;
+				}
+			}
+		}
+		else {
+			//and
+			if (!isTrue(m_val)) {
+				//the left side is false
+				m_val = false;
+			}
+			else {
+				log.m_right->accept(this);
+				if (isTrue(m_val)) {
+					//both the left side and the right side are true
+					m_val = true;
+				}
+				else {
+					//the left side is true but the right side is false
+					m_val = false;
+				}
+			}
+		}
+	}
+
+	//Statements
 
 	virtual void visit(const Print& print) override;
 	virtual void visit(const Expression& expr) override;
 	virtual void visit(const Var& stmt) override;
 	virtual void visit(const Block& block) override;
+	virtual void visit(const If& ifStmt) override;
 
 	void interpret(const std::vector<Stmt_ptr>& stmts);
 	std::string interpret(Expr_ptr expr);

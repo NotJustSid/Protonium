@@ -59,9 +59,12 @@ private:
 	Stmt_ptr vardefn();
 	Stmt_ptr printstmt();
 	Stmts block();
+	Stmt_ptr ifstmt();
 	Stmt_ptr exprstmt();
 
 	Expr_ptr expression();
+	Expr_ptr lor();
+	Expr_ptr land();
 	Expr_ptr equality();
 	Expr_ptr comparision();
 	Expr_ptr addition();

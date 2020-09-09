@@ -203,6 +203,18 @@ void Interpreter::visit(const Block& block) {
 	executeBlock(block.m_stmts, std::make_shared<Environment>(m_env));
 }
 
+void Interpreter::visit(const If& ifStmt) {
+
+	ifStmt.m_condition->accept(this);
+	if (isTrue(m_val)) {
+		execute(ifStmt.m_thenBranch);
+	}
+	else if (ifStmt.m_elseBranch != nullptr) {
+		execute(ifStmt.m_elseBranch);
+	}
+
+}
+
 void Interpreter::execute(Stmt_ptr stmt) {
 	stmt->accept(this);
 }

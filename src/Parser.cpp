@@ -109,6 +109,9 @@ Stmt_ptr Parser::statement() {
 		if (match({ TokenType::LBRACE })) {
 			return std::make_shared<Block>(block());
 		}
+		if (match({ TokenType::IF })) {
+			return ifstmt();
+		}
 		return exprstmt();
 	}
 	catch (const ParseError&) {
@@ -144,6 +147,20 @@ Stmts Parser::block() {
 	return statements;
 }
 
+Stmt_ptr Parser::ifstmt() {
+	matchWithErr(TokenType::LPAREN, "Expected a '(' after 'if'.");
+	auto condition = expression();
+	matchWithErr(TokenType::RPAREN, "Expected a ')' after if condition.");
+
+	auto then = statement();
+	Stmt_ptr elseBranch{ nullptr };
+	if (match({ TokenType::ELSE })) {
+		elseBranch = statement();
+	}
+
+	return std::make_shared<If>(condition, then, elseBranch);
+}
+
 Stmt_ptr Parser::exprstmt() {
 	auto expr = expression();
 	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
@@ -152,7 +169,31 @@ Stmt_ptr Parser::exprstmt() {
 }
 
 Expr_ptr Parser::expression() {
-	return equality();
+	return lor();
+}
+
+Expr_ptr Parser::lor() {
+	auto expr = land();
+
+	while (match({ TokenType::OR })) {
+		Token op = previous();
+		auto right = land();
+		expr = std::make_shared<Logical>(expr, op, right);
+	}
+
+	return expr;
+}
+
+Expr_ptr Parser::land() {
+	auto expr = equality();
+
+	while (match({ TokenType::AND })) {
+		Token op = previous();
+		auto right = equality();
+		expr = std::make_shared<Logical>(expr, op, right);
+	}
+
+	return expr;
 }
 
 Expr_ptr Parser::equality() {

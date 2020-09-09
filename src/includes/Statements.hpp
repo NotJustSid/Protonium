@@ -5,6 +5,7 @@ class Expression;
 class Print;
 class Var;
 class Block;
+class If;
 
 class StmtVisitor {
 public:
@@ -12,6 +13,7 @@ public:
 	virtual void visit(const Print&) = 0;
 	virtual void visit(const Var&) = 0;
 	virtual void visit(const Block&) = 0;
+	virtual void visit(const If&) = 0;
 };
 
 class Stmt {
@@ -52,5 +54,15 @@ public:
 	std::vector<Stmt_ptr> m_stmts;
 public:
 	Block(std::vector<Stmt_ptr> stmts);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class If : public Stmt {
+public:
+	Expr_ptr m_condition;
+	Stmt_ptr m_thenBranch;
+	Stmt_ptr m_elseBranch;
+public:
+	If(Expr_ptr condition, Stmt_ptr thenBranch, Stmt_ptr elseBranch);
 	virtual void accept(StmtVisitor* visitor) const override;
 };
