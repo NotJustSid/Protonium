@@ -8,6 +8,7 @@
 #include "includes/Interpreter.hpp"
 
 #include "dep/rang.hpp"
+using namespace rang;
 
 Proto& Proto::getInstance() {
     static Proto proto;
@@ -37,7 +38,7 @@ void Proto::runFile(std::string_view path) {
     fs::path loc{ path.data() };
 
     if (!fs::is_regular_file(loc)) {
-        std::cerr << "[ERR] Path not recognized as a file.";
+        std::cerr << fgB::red << "[ERR] Path not recognized as a file." << fg::reset;
         std::exit(64);
     }
     else {
@@ -65,8 +66,6 @@ bool Proto::hadError() const {
 bool Proto::hadRuntimeError() const {
     return m_hitRuntimeError;
 }
-
-using namespace rang;
 
 void Proto::error(std::size_t line, std::string_view msg, std::string snippet) {
     std::cerr << fgB::red  << "[ERROR | Line " << line << "]: " << fg::reset << style::dim << msg << snippet << style::reset << '\n';

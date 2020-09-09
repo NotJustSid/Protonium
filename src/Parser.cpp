@@ -13,11 +13,8 @@ std::variant<Stmts, Expr_ptr> Parser::parse() {
 		statements.push_back(statement());
 
 		if (m_foundExpr) {
-			if (auto a = std::dynamic_pointer_cast<Expression>(statements.back())) {
+			if (auto a = std::static_pointer_cast<Expression>(statements.back())) {
 				return a->m_expr;
-			}
-			if (auto a = std::dynamic_pointer_cast<Var>(statements.back())) {
-				return a->m_initializer;
 			}
 		}
 		m_allowExpr = false;
@@ -126,8 +123,8 @@ Stmt_ptr Parser::vardefn() {
 		
 	init = expression();
 
-	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
-	else matchWithErr(TokenType::SEMICOLON, "Expected a ';' after variable definition.");
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after variable definition.");
+
 	return std::make_shared<Var>(name, init);
 }
 
