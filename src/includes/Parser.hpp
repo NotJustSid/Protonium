@@ -56,7 +56,6 @@ private:
 
 //! Production rules
 	Stmt_ptr statement();
-	Stmt_ptr vardefn();
 	Stmt_ptr printstmt();
 	Stmts block();
 	Stmt_ptr ifstmt();
@@ -65,6 +64,7 @@ private:
 
 
 	Expr_ptr expression();
+	Expr_ptr assignment();
 	Expr_ptr lor();
 	Expr_ptr land();
 	Expr_ptr equality();

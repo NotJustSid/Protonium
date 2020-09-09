@@ -21,11 +21,17 @@ enum class TokenType {
     GREATER, GT_EQUAL,
     LESS, LT_EQUAL,
 
+    BT_EQUAL,
+    PROD_EQUAL,
+    DIV_EQUAL,
+    PLUS_EQUAL,
+    MINUS_EQUAL,
+
     IDENTIFIER, STRING, NUMBER,
 
     AND,
     OR,
-    PRINT, //! This won't be there in the actual thingy, only in the prototype
+    PRINT,
     TRUE,
     FALSE,
     FUNCTION,

@@ -17,8 +17,12 @@ bool Environment::isDefined(std::string name) const {
 	return m_vars.contains(name);
 }
 
-void Environment::define(std::string name, Value val) {
+void Environment::assign(std::string name, Value val) {
 	m_vars[name] = val;
+}
+
+void Environment::strictAssign(std::string name, Value val) {
+	
 }
 
 //! Global scope

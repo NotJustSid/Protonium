@@ -17,6 +17,7 @@ class ParenGroup;
 class Literal;
 class Variable;
 class Logical;
+class Assign;
 
 class ExprVisitor {
 //! Note that this is just using overloading and no dynamic binding stuff
@@ -27,6 +28,7 @@ public:
 	virtual void visit(const Literal&) = 0;
 	virtual void visit(const Variable&) = 0;
 	virtual void visit(const Logical&) = 0;
+	virtual void visit(const Assign&) = 0;
 };
 
 class Expr {
@@ -91,6 +93,16 @@ public:
 public:
 	Logical(Expr_ptr left, Token op, Expr_ptr right);
 	virtual void accept(ExprVisitor* visitor)const override;
+};
+
+class Assign : public Expr {
+public:
+	Token m_name;
+	Token m_op;
+	Expr_ptr m_val;
+public:
+	Assign(Token name, Token op, Expr_ptr val);
+	virtual void accept(ExprVisitor* visitor) const override;
 };
 
 //! Outdated Tree printer

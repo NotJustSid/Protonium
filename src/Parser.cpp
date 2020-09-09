@@ -98,11 +98,6 @@ void Parser::sync() {
 
 Stmt_ptr Parser::statement() {
 	try {
-		if (match({ TokenType::IDENTIFIER })) {
-			if (match({ TokenType::EQUAL }))
-				return vardefn();
-			else m_current--;
-		}
 		if (match({ TokenType::PRINT })) {
 			return printstmt();
 		}
@@ -121,17 +116,6 @@ Stmt_ptr Parser::statement() {
 		sync();
 		return nullptr;
 	}
-}
-
-Stmt_ptr Parser::vardefn() {
-	auto name = m_tokens.at(m_current - 2);
-	Expr_ptr init;
-		
-	init = expression();
-
-	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after variable definition.");
-
-	return std::make_shared<Var>(name, init);
 }
 
 Stmt_ptr Parser::printstmt() {
@@ -182,7 +166,25 @@ Stmt_ptr Parser::exprstmt() {
 }
 
 Expr_ptr Parser::expression() {
-	return lor();
+	return assignment();
+}
+
+Expr_ptr Parser::assignment() {
+	auto expr = lor();
+
+	if (match({ TokenType::EQUAL })) {
+		Token op = previous();
+		Expr_ptr val = assignment();
+
+		if (std::static_pointer_cast<Variable>(expr)) {
+			auto name = std::static_pointer_cast<Variable>(expr)->m_name;
+			return std::make_shared<Assign>(name, op, val);
+		}
+
+		error(op, "Invalid assignment location.");
+	}
+
+	return expr;
 }
 
 Expr_ptr Parser::lor() {

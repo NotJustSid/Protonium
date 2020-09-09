@@ -150,13 +150,13 @@ void Lexer::scanToken(Proto& p) {
         addToken(TokenType::COMMA);
         break;
     case '+':
-        addToken(TokenType::PLUS);
+        addToken(isNext('=') ? TokenType::PLUS_EQUAL : TokenType::PLUS);
         break;
     case '-':
-        addToken(TokenType::MINUS);
+        addToken(isNext('=') ? TokenType::MINUS_EQUAL : TokenType::MINUS);
         break;
     case '*':
-        addToken(TokenType::PRODUCT);
+        addToken(isNext('=')? TokenType::PROD_EQUAL : TokenType::PRODUCT);
         break;
     case ';':
         addToken(TokenType::SEMICOLON);
@@ -166,6 +166,9 @@ void Lexer::scanToken(Proto& p) {
         break;
     case '=':
         addToken(isNext('=') ? TokenType::EQ_EQUAL : TokenType::EQUAL);
+        break;
+    case '`':
+        isNext('=') ? addToken(TokenType::BT_EQUAL) : p.error(m_line, "Unexpected character: ", std::string(1, c));
         break;
     case '>':
         addToken(isNext('=') ? TokenType::GT_EQUAL : TokenType::GREATER);
@@ -186,7 +189,7 @@ void Lexer::scanToken(Proto& p) {
                 advance();
             }
         }
-        else addToken(TokenType::DIVISON);
+        else addToken(isNext('=') ? TokenType::DIV_EQUAL : TokenType::DIVISON);
         break;
     case ' ': 
     case '\t':

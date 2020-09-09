@@ -64,3 +64,11 @@ Logical::Logical(Expr_ptr left, Token op, Expr_ptr right) : m_left(left), m_op(o
 void Logical::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Assign::Assign(Token name, Token op, Expr_ptr val) : m_name(name), m_op(op), m_val(val) {
+
+}
+
+void Assign::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}

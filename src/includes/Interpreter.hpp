@@ -44,12 +44,12 @@ public:
 	virtual void visit(const Literal& lit) override;
 	virtual void visit(const Variable& var) override;
 	virtual void visit(const Logical& log) override;
+	virtual void visit(const Assign& expr) override;
 
 	//Statements
 
 	virtual void visit(const Print& print) override;
 	virtual void visit(const Expression& expr) override;
-	virtual void visit(const Var& stmt) override;
 	virtual void visit(const Block& block) override;
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;

@@ -15,7 +15,8 @@ private:
 public:
 	Value& get(Token name);
 	bool isDefined(std::string name) const;
-	void define(std::string name, Value val);
+	void assign(std::string name, Value val);
+	void strictAssign(std::string name, Value val);
 	//! Global scope
 	Environment();
 	//! Local scope

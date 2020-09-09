@@ -225,6 +225,13 @@ void Interpreter::visit(const Logical& log) {
 	}
 }
 
+void Interpreter::visit(const Assign& expr) {
+	expr.m_val->accept(this);
+
+	m_env->assign(expr.m_name.str(), m_val);
+}
+
+
 void Interpreter::visit(const Print& print) {
 	print.m_expr->accept(this);
 	std::cout << std::setprecision(maxPrecision) << stringify(m_val);
@@ -232,11 +239,6 @@ void Interpreter::visit(const Print& print) {
 
 void Interpreter::visit(const Expression& expr) {
 	expr.m_expr->accept(this);
-}
-
-void Interpreter::visit(const Var& stmt) {
-	stmt.m_initializer->accept(this);
-	m_env->define(stmt.m_name.str(), m_val);
 }
 
 void Interpreter::visit(const Block& block) {
