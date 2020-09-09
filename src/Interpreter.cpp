@@ -185,6 +185,46 @@ void Interpreter::visit(const Variable& var) {
 	m_val = m_env->get(var.m_name);
 }
 
+void Interpreter::visit(const Logical& log) {
+	log.m_left->accept(this);
+
+	if (log.m_op.getType() == TokenType::OR) {
+		if (isTrue(m_val)) {
+			//the left side is true
+			m_val = true;
+		}
+		else {
+			log.m_right->accept(this);
+			if (isTrue(m_val)) {
+				//the left is false and right side is true
+				m_val = true;
+			}
+			else {
+				//both the left and right side are false
+				m_val = false;
+			}
+		}
+	}
+	else {
+		//and
+		if (!isTrue(m_val)) {
+			//the left side is false
+			m_val = false;
+		}
+		else {
+			log.m_right->accept(this);
+			if (isTrue(m_val)) {
+				//both the left side and the right side are true
+				m_val = true;
+			}
+			else {
+				//the left side is true but the right side is false
+				m_val = false;
+			}
+		}
+	}
+}
+
 void Interpreter::visit(const Print& print) {
 	print.m_expr->accept(this);
 	std::cout << std::setprecision(maxPrecision) << stringify(m_val);
@@ -215,11 +255,18 @@ void Interpreter::visit(const If& ifStmt) {
 
 }
 
+void Interpreter::visit(const While& whilestmt) {
+	whilestmt.m_condition->accept(this);
+	while (isTrue(m_val)) {
+		execute(whilestmt.m_body);
+	}
+}
+
 void Interpreter::execute(Stmt_ptr stmt) {
 	stmt->accept(this);
 }
 
-void Interpreter::executeBlock(std::vector<Stmt_ptr> stmts, Env_ptr env)
+void Interpreter::executeBlock(Stmts stmts, Env_ptr env)
 {
 	Env_ptr parent = m_env;
 	

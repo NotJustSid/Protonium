@@ -6,6 +6,7 @@ class Print;
 class Var;
 class Block;
 class If;
+class While;
 
 class StmtVisitor {
 public:
@@ -14,6 +15,7 @@ public:
 	virtual void visit(const Var&) = 0;
 	virtual void visit(const Block&) = 0;
 	virtual void visit(const If&) = 0;
+	virtual void visit(const While&) = 0;
 };
 
 class Stmt {
@@ -64,5 +66,14 @@ public:
 	Stmt_ptr m_elseBranch;
 public:
 	If(Expr_ptr condition, Stmt_ptr thenBranch, Stmt_ptr elseBranch);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class While : public Stmt {
+public:
+	Expr_ptr m_condition;
+	Stmt_ptr m_body;
+public:
+	While(Expr_ptr condition, Stmt_ptr body);
 	virtual void accept(StmtVisitor* visitor) const override;
 };

@@ -39,3 +39,11 @@ If::If(Expr_ptr condition, Stmt_ptr thenBranch, Stmt_ptr elseBranch) : m_conditi
 void If::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+While::While(Expr_ptr condition, Stmt_ptr body) : m_condition(condition), m_body(body) {
+
+}
+
+void While::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}

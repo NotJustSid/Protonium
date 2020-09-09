@@ -112,6 +112,9 @@ Stmt_ptr Parser::statement() {
 		if (match({ TokenType::IF })) {
 			return ifstmt();
 		}
+		if (match({ TokenType::WHILE })) {
+			return whilestmt();
+		}
 		return exprstmt();
 	}
 	catch (const ParseError&) {
@@ -159,6 +162,16 @@ Stmt_ptr Parser::ifstmt() {
 	}
 
 	return std::make_shared<If>(condition, then, elseBranch);
+}
+
+Stmt_ptr Parser::whilestmt() {
+	matchWithErr(TokenType::LPAREN, "Expected a '(' after 'while'.");
+	auto condition = expression();
+	matchWithErr(TokenType::RPAREN, "Expected a ')' after while condition.");
+
+	auto body = statement();
+
+	return std::make_shared<While>(condition, body);
 }
 
 Stmt_ptr Parser::exprstmt() {

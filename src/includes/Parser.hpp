@@ -60,7 +60,9 @@ private:
 	Stmt_ptr printstmt();
 	Stmts block();
 	Stmt_ptr ifstmt();
+	Stmt_ptr whilestmt();
 	Stmt_ptr exprstmt();
+
 
 	Expr_ptr expression();
 	Expr_ptr lor();
