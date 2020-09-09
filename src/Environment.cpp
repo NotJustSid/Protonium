@@ -17,12 +17,20 @@ bool Environment::isDefined(std::string name) const {
 	return m_vars.contains(name);
 }
 
-void Environment::assign(std::string name, Value val) {
-	m_vars[name] = val;
+void Environment::assign(Token name, Value val) {
+	m_vars[name.str()] = val;
 }
 
-void Environment::strictAssign(std::string name, Value val) {
-	
+void Environment::strictAssign(Token name, Value val) {
+	if (m_vars.contains(name.str())) {
+		m_vars[name.str()] = val;
+	}
+	else if (m_parent != nullptr) {
+		m_parent->strictAssign(name, val);
+	}
+	else {
+		throw RuntimeError(name, "Undefined variable '" + name.str() + "'.");
+	}
 }
 
 //! Global scope

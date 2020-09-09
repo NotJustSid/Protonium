@@ -35,8 +35,7 @@ bool Interpreter::isBool(const Value& val) {
 }
 
 bool Interpreter::isTrue(const Value& val) {
-	//? return an error if the thingy is not a bool?
-
+	//TODO return an error if the thingy is not a bool
 	if (isNix(val)) {
 		return false;
 	}
@@ -228,7 +227,12 @@ void Interpreter::visit(const Logical& log) {
 void Interpreter::visit(const Assign& expr) {
 	expr.m_val->accept(this);
 
-	m_env->assign(expr.m_name.str(), m_val);
+	if (expr.m_op.getType() == TokenType::EQUAL) {
+		m_env->assign(expr.m_name, m_val);
+	}
+	else if (expr.m_op.getType() == TokenType::BT_EQUAL) {
+		m_env->strictAssign(expr.m_name, m_val);
+	}
 }
 
 
@@ -261,6 +265,7 @@ void Interpreter::visit(const While& whilestmt) {
 	whilestmt.m_condition->accept(this);
 	while (isTrue(m_val)) {
 		execute(whilestmt.m_body);
+		whilestmt.m_condition->accept(this);
 	}
 }
 

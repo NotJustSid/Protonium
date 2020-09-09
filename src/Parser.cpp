@@ -172,7 +172,7 @@ Expr_ptr Parser::expression() {
 Expr_ptr Parser::assignment() {
 	auto expr = lor();
 
-	if (match({ TokenType::EQUAL })) {
+	if (match({ TokenType::EQUAL, TokenType::BT_EQUAL })) {
 		Token op = previous();
 		Expr_ptr val = assignment();
 
