@@ -184,6 +184,47 @@ Expr_ptr Parser::assignment() {
 		error(op, "Invalid assignment location.");
 	}
 
+	if (match({ TokenType::PROD_EQUAL, TokenType::DIV_EQUAL, TokenType::PLUS_EQUAL, TokenType::MINUS_EQUAL })) {
+		Token op = previous();
+		auto val = assignment();
+
+		/*
+		*	desugaring:
+			a += 2 => a `= a + 2
+			a -= 2 => a `= a - 2
+			a *= 2 => a `= a * 2
+			a /= 2 => a `= a / 2
+		*/
+
+		if (auto var = std::dynamic_pointer_cast<Variable>(expr)) {
+			
+			switch (op.getType()) {
+			case TokenType::PLUS_EQUAL:
+				op = Token(TokenType::PLUS, "+", op.getLine(), LiteralType::NONE);
+				val = std::make_shared<Binary>(var, op, val);
+				break;
+			case TokenType::MINUS_EQUAL:
+				op = Token(TokenType::MINUS, "-", op.getLine(), LiteralType::NONE);
+				val = std::make_shared<Binary>(var, op, val);
+				break;
+			case TokenType::PROD_EQUAL:
+				op = Token(TokenType::PRODUCT, "*", op.getLine(), LiteralType::NONE);
+				val = std::make_shared<Binary>(var, op, val);
+				break;
+			case TokenType::DIV_EQUAL:
+				op = Token(TokenType::DIVISON, "/", op.getLine(), LiteralType::NONE);
+				val = std::make_shared<Binary>(var, op, val);
+				break;
+			}
+
+			op  = Token(TokenType::BT_EQUAL, "`=", op.getLine(), LiteralType::NONE);
+			return std::make_shared<Assign>(var->m_name, op, val);
+		}
+		else {
+			error(op, "Invalid assignment location.");
+		}
+	}
+
 	return expr;
 }
 
