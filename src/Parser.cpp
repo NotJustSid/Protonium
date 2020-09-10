@@ -369,7 +369,7 @@ Expr_ptr Parser::primary() {
 	if (match({ TokenType::LPAREN })) {
 		auto expr = expression();
 		matchWithErr(TokenType::RPAREN, "Expected ')' after expression.");
-		return expr;
+		return std::make_shared<ParenGroup>(expr);
 	}
 
 	if (match({ TokenType::IDENTIFIER })) {
