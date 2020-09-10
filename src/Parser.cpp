@@ -176,8 +176,8 @@ Expr_ptr Parser::assignment() {
 		Token op = previous();
 		Expr_ptr val = assignment();
 
-		if (std::static_pointer_cast<Variable>(expr)) {
-			auto name = std::static_pointer_cast<Variable>(expr)->m_name;
+		if (auto var = std::dynamic_pointer_cast<Variable>(expr)) {
+			auto name = var->m_name;
 			return std::make_shared<Assign>(name, op, val);
 		}
 
