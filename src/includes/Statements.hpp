@@ -42,9 +42,9 @@ public:
 
 class Block : public Stmt {
 public:
-	std::vector<Stmt_ptr> m_stmts;
+	Stmts m_stmts;
 public:
-	Block(std::vector<Stmt_ptr> stmts);
+	Block(Stmts stmts);
 	virtual void accept(StmtVisitor* visitor) const override;
 };
 

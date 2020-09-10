@@ -60,6 +60,7 @@ private:
 	Stmts block();
 	Stmt_ptr ifstmt();
 	Stmt_ptr whilestmt();
+	Stmt_ptr forstmt();
 	Stmt_ptr exprstmt();
 
 

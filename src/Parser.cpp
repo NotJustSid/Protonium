@@ -110,6 +110,9 @@ Stmt_ptr Parser::statement() {
 		if (match({ TokenType::WHILE })) {
 			return whilestmt();
 		}
+		if (match({ TokenType::FOR })) {
+			return forstmt();
+		}
 		return exprstmt();
 	}
 	catch (const ParseError&) {
@@ -156,6 +159,55 @@ Stmt_ptr Parser::whilestmt() {
 	auto body = statement();
 
 	return std::make_shared<While>(condition, body);
+}
+
+Stmt_ptr Parser::forstmt() {
+	matchWithErr(TokenType::LPAREN, "Expected a '(' after 'for'.");
+	
+	Stmt_ptr init;
+	if (match({ TokenType::SEMICOLON })) {
+		init = nullptr;
+	}
+	else {
+		init = exprstmt();
+	}
+
+	Expr_ptr condition{ nullptr };
+	if (!isNextType(TokenType::SEMICOLON)) {
+		//if the condition clause hasn't been omitted.
+		condition = expression();
+	}
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after for-loop condition.");
+
+	Expr_ptr increment{ nullptr };
+	if (!isNextType(TokenType::RPAREN)) {
+		//if the increment clause hasn't been omitted.
+		increment = expression();
+	}
+	matchWithErr(TokenType::RPAREN, "Expected a ')' after for-loop clauses.");
+
+	Stmt_ptr body = statement();
+	
+	//desugarize and make this a while loop
+
+	if (increment) {
+		Stmts stmts;
+		stmts.push_back(body);
+		stmts.push_back(std::make_shared<Expression>(increment));
+		body = std::make_shared<Block>(stmts);
+	}
+
+	if (condition == nullptr) condition = std::make_shared<Literal>(Token(TokenType::TRUE, "true", 0, LiteralType::TRUE));
+	body = std::make_shared<While>(condition, body);
+
+	if (init) {
+		Stmts stmts;
+		stmts.push_back(init);
+		stmts.push_back(body);
+		body = std::make_shared<Block>(stmts);
+	}
+
+	return body;
 }
 
 Stmt_ptr Parser::exprstmt() {
