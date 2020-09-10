@@ -118,6 +118,12 @@ void Interpreter::visit(const Binary& bin) {
 		}
 		m_val = std::get<long double>(left) / std::get<long double>(right);
 		return;
+	case TokenType::EXPONENTATION:
+		if (!numOperands) {
+			throw RuntimeError(bin.m_op, "Operands must be numbers.");
+		}
+		m_val = std::powl(std::get<long double>(left), std::get<long double>(right));
+		return;
 
 		//comparisions
 	case TokenType::GT_EQUAL:

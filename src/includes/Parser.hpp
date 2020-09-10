@@ -73,6 +73,7 @@ private:
 	Expr_ptr addition();
 	Expr_ptr product();
 	Expr_ptr unary();
+	Expr_ptr exponentiation();
 	Expr_ptr primary();
 };
 

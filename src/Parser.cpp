@@ -358,7 +358,17 @@ Expr_ptr Parser::unary() {
 		return std::make_shared<Unary>(op, right);
 	}
 
-	return primary();
+	return exponentiation();
+}
+
+Expr_ptr Parser::exponentiation() {
+	auto base = primary();
+	if (match({ TokenType::EXPONENTATION })) {
+		Token op = previous();
+		auto power = exponentiation();
+		base = std::make_shared<Binary>(base, op, power);
+	}
+	return base;
 }
 
 Expr_ptr Parser::primary() {

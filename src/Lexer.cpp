@@ -170,6 +170,9 @@ void Lexer::scanToken(Proto& p) {
     case ';':
         addToken(TokenType::SEMICOLON);
         break;
+    case '^':
+        addToken(TokenType::EXPONENTATION);
+        break;
     case '!':
         addToken(isNext('=') ? TokenType::NOT_EQUAL : TokenType::NOT);
         break;

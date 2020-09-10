@@ -15,6 +15,7 @@ enum class TokenType {
     PRODUCT,
     DIVISON,
     SEMICOLON,
+    EXPONENTATION,
 
     NOT, NOT_EQUAL,
     EQUAL, EQ_EQUAL,
