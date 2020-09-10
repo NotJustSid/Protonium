@@ -1,7 +1,7 @@
 #include <cstdlib>    //std::exit
 #include <iostream>
 #include <string>
-#include <list>
+#include <algorithm>
 
 #define EXIT_UNEXPECTED_ARGS 2
 
@@ -11,13 +11,36 @@
 
 using namespace rang;
 
+std::size_t braceParenCount(std::string code) {
+    std::size_t count{ 0 };
+    auto braceParenCounter = [&count](char c) {
+        if (c == '(' || c == '{') count++;
+        if ((c == ')' || c == '}') && count != 0) count--;
+        //if the count is 0, let the interpreter throw an error
+    };
+    std::for_each(code.begin(), code.end(), braceParenCounter);
+    return count;
+}
+
 void repl(Proto& proto) {
     std::string line;
+    std::string code;
 
-    while (std::cout << fgB::green <<"proto> " << fg::reset << style::reset, std::getline(std::cin, line)) {
-        proto.run(line, true);
+    while (std::cout << fgB::green <<"proto> " << fg::reset, std::getline(std::cin, line)) {
+
+        code += line;
+        while (braceParenCount(code) != 0) {
+            std::cout <<"       ";
+            std::getline(std::cin, line);
+            code += '\n';
+            code += line;
+        }
+
+        proto.run(code, true);
+        
         proto.setErr(false); //set error to false for each repl thingy
         std::cout << '\n'; //print a new line before repeating
+        code = "";
     }
 }
 
