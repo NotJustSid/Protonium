@@ -20,7 +20,7 @@ void Lexer::addToken(TokenType type, LiteralType ltype) {
         //! Make the lexeme the value of the str; remove the quotes
         lexeme = lexeme.substr(1, lexeme.length() - 2);
         
-        //! Unescape escape sequences. Only \n and \t are supported.
+        //! Facilitate escape sequences. Only \n, \t, \" and \\ are supported.
         for (size_t i = 0; i < lexeme.length(); i++) {
             if (lexeme.at(i) == '\\') {
                 if (i + 1 < lexeme.length()) {
@@ -30,6 +30,9 @@ void Lexer::addToken(TokenType type, LiteralType ltype) {
                         break;
                     case 't':
                         lexeme = lexeme.substr(0, i) + '\t' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        break;
+                    case '"':
+                        lexeme = lexeme.substr(0, i) + '"' + lexeme.substr(i + 2, lexeme.length() - i - 1);
                         break;
                     case '\\':
                         lexeme = lexeme.substr(0, i) + '\\' + lexeme.substr(i + 2, lexeme.length() - i - 1);
@@ -79,9 +82,15 @@ char Lexer::peekby2() const {
 }
 
 void Lexer::string(Proto& p) {
-    while (peek() != '"' && !isAtEnd()) {
-        if (peek() == '\n') m_line++;
-        advance();
+    while (!isAtEnd()) {
+        if (peek() != '"') {
+            if (peek() == '\n') m_line++;
+            advance();
+        }
+        else if (m_src.at(m_current - 1) == '\\' && m_src.at(m_current - 2) != '\\') {
+            advance();
+        }
+        else break;
     }
 
     ///Error if string is unterminated
