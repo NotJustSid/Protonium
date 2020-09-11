@@ -35,12 +35,14 @@ bool Interpreter::isBool(const Value& val) {
 }
 
 bool Interpreter::isTrue(const Value& val) {
-	//TODO return an error if the thingy is not a bool
 	if (isNix(val)) {
 		return false;
 	}
 	if (isBool(val)) {
 		return std::get<bool>(val);
+	}
+	if (isNum(val) && isEqual(std::get<long double>(val), 0)) {
+		return false;
 	}
 	return true;
 }
