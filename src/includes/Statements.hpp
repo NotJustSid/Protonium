@@ -2,7 +2,6 @@
 #include "Expressions.hpp"
 
 class Expression;
-class Print;
 class Block;
 class If;
 class While;
@@ -10,7 +9,6 @@ class While;
 class StmtVisitor {
 public:
 	virtual void visit(const Expression&) = 0;
-	virtual void visit(const Print&) = 0;
 	virtual void visit(const Block&) = 0;
 	virtual void visit(const If&) = 0;
 	virtual void visit(const While&) = 0;
@@ -29,14 +27,6 @@ public:
 	Expr_ptr m_expr;
 public:
 	Expression(Expr_ptr expr);
-	virtual void accept(StmtVisitor* visitor) const override;
-};
-
-class Print : public Stmt {
-public:
-	Expr_ptr m_expr;
-public:
-	Print(Expr_ptr expr);
 	virtual void accept(StmtVisitor* visitor) const override;
 };
 

@@ -1,7 +1,6 @@
 #include <cstdlib>    //std::exit
 #include <iostream>
 #include <string>
-#include <algorithm>
 
 #define EXIT_UNEXPECTED_ARGS 2
 
@@ -11,15 +10,27 @@
 
 using namespace rang;
 
-std::size_t braceParenCount(std::string code) {
+bool requireNewLine(const std::string& code) {
     std::size_t count{ 0 };
-    auto braceParenCounter = [&count](char c) {
-        if (c == '(' || c == '{') count++;
-        if ((c == ')' || c == '}') && count != 0) count--;
-        //if the count is 0, let the interpreter throw an error
-    };
-    std::for_each(code.begin(), code.end(), braceParenCounter);
-    return count;
+    bool withinQuotes{ false };
+
+    for (auto it = code.begin(); it != code.end(); ++it) {
+        if (*it == '"') {
+            if (withinQuotes) {
+                if (*(it - 1) != '\\') {
+                    withinQuotes = !withinQuotes;
+                }
+            }
+            else withinQuotes = !withinQuotes;
+        }
+        
+        if (!withinQuotes) {
+            if (*it == '(' || *it == '{') count++;
+            if ((*it == ')' || *it == '}') && count != 0) count--;
+        }
+    }
+
+    return count == 0 && withinQuotes;
 }
 
 void repl(Proto& proto) {
@@ -29,7 +40,7 @@ void repl(Proto& proto) {
     while (std::cout << fgB::green <<"proto> " << fg::reset, std::getline(std::cin, line)) {
 
         code += line;
-        while (braceParenCount(code) != 0) {
+        while (requireNewLine(code)) {
             std::cout <<"       ";
             std::getline(std::cin, line);
             code += '\n';

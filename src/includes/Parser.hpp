@@ -56,7 +56,6 @@ private:
 
 //! Production rules
 	Stmt_ptr statement();
-	Stmt_ptr printstmt();
 	Stmts block();
 	Stmt_ptr ifstmt();
 	Stmt_ptr whilestmt();

@@ -30,14 +30,13 @@ private:
 	bool isEqual(const Value& left, const Value& right);
 	bool isEqual(long double left, long double right);
 
-	std::string stringify(const Value& value, const char* strContainer = "");
 	void execute(Stmt_ptr stmt);
 	void executeBlock(Stmts stmts, Env_ptr env);
-
 
 	Interpreter();
 public:
 	static Interpreter& getInstance();
+	std::string stringify(const Value& value, const char* strContainer = "");
 	Interpreter(const Interpreter&) = delete;
 	void operator=(const Interpreter&) = delete;
 	
@@ -52,7 +51,6 @@ public:
 
 	//Statements
 
-	virtual void visit(const Print& print) override;
 	virtual void visit(const Expression& expr) override;
 	virtual void visit(const Block& block) override;
 	virtual void visit(const If& ifStmt) override;

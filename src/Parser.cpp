@@ -86,7 +86,6 @@ void Parser::sync() {
 		case TokenType::FOR:
 		case TokenType::FUNCTION:
 		case TokenType::RETURN:
-		case TokenType::PRINT:
 			return;
 		}
 
@@ -98,9 +97,6 @@ void Parser::sync() {
 
 Stmt_ptr Parser::statement() {
 	try {
-		if (match({ TokenType::PRINT })) {
-			return printstmt();
-		}
 		if (match({ TokenType::LBRACE })) {
 			return std::make_shared<Block>(block());
 		}
@@ -119,12 +115,6 @@ Stmt_ptr Parser::statement() {
 		sync();
 		return nullptr;
 	}
-}
-
-Stmt_ptr Parser::printstmt() {
-	auto expr = expression();
-	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after statement.");
-	return std::make_shared<Print>(expr);
 }
 
 Stmts Parser::block() {
@@ -212,7 +202,7 @@ Stmt_ptr Parser::forstmt() {
 
 Stmt_ptr Parser::exprstmt() {
 	auto expr = expression();
-	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
+	if (m_allowExpr && isAtEnd() && !std::dynamic_pointer_cast<Call>(expr)) m_foundExpr = true;
 	else matchWithErr(TokenType::SEMICOLON, "Invalid Syntax. Did you miss a ';' after the expression?");
 	return std::make_shared<Expression>(expr);
 }

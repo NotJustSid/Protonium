@@ -20,7 +20,9 @@ Interpreter::Interpreter() {
 	m_val = nullptr;
 
 	Value readfunc = std::make_shared<Read>();
+	Value printfunc = std::make_shared<Print>();
 	m_global->assign("read", readfunc);
+	m_global->assign("print", printfunc);
 }
 
 bool Interpreter::isNum(const Value& val) {
@@ -277,12 +279,6 @@ void Interpreter::visit(const Call& expr) {
 	}
 
 	m_val = fn->call(args);
-}
-
-
-void Interpreter::visit(const Print& print) {
-	print.m_expr->accept(this);
-	std::cout << std::setprecision(maxPrecision) << stringify(m_val);
 }
 
 void Interpreter::visit(const Expression& expr) {

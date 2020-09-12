@@ -32,7 +32,6 @@ enum class TokenType {
 
     AND,
     OR,
-    PRINT,
     TRUE,
     FALSE,
     FUNCTION,
@@ -76,7 +75,6 @@ const std::unordered_map<TokenType, std::string_view> typeStr = {
     {TokenType::NUMBER, "NUMBER"},
     {TokenType::OR, "OR"},
     {TokenType::PLUS, "PLUS"},
-    {TokenType::PRINT, "PRINT"},
     {TokenType::PRODUCT, "PRODUCT"},
     {TokenType::RBRACE, "RBRACE"},
     {TokenType::RETURN, "RETURN"},
@@ -101,7 +99,6 @@ const std::unordered_map<std::string, TokenType> keywords = {
     {"or", TokenType::OR},
     {"this", TokenType::THIS},
     {"while", TokenType::WHILE},
-    {"print", TokenType::PRINT},
     {"return", TokenType::RETURN}
 };
 
