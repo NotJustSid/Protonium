@@ -202,7 +202,7 @@ Stmt_ptr Parser::forstmt() {
 
 Stmt_ptr Parser::exprstmt() {
 	auto expr = expression();
-	if (m_allowExpr && isAtEnd() && !std::dynamic_pointer_cast<Call>(expr)) m_foundExpr = true;
+	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
 	else matchWithErr(TokenType::SEMICOLON, "Invalid Syntax. Did you miss a ';' after the expression?");
 	return std::make_shared<Expression>(expr);
 }

@@ -346,7 +346,10 @@ void Interpreter::interpret(const Stmts& stmts) {
 std::string Interpreter::interpret(Expr_ptr expr) {
 	try {
 		expr->accept(this);
-		return stringify(m_val, "\"");
+		if (!(std::dynamic_pointer_cast<Call>(expr) && isNix(m_val))) {
+			return stringify(m_val, "\"");
+		}
+		else return "";
 	}
 	catch (const RuntimeError& err) {
 		Proto::getInstance().runtimeError(err);
