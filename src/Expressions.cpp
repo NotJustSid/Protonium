@@ -1,4 +1,5 @@
 #include "includes/Expressions.hpp"
+#include "includes/Callable.hpp"
 
 Binary::Binary(Expr_ptr l, Token op, Expr_ptr r) : m_left(l), m_op(op), m_right(r) {
 
@@ -70,5 +71,13 @@ Assign::Assign(Token name, Token op, Expr_ptr val) : m_name(name), m_op(op), m_v
 }
 
 void Assign::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}
+
+Call::Call(Expr_ptr callee, Token rparen, const std::vector<Expr_ptr>& args) : m_callee(callee), m_paren(rparen), m_args(args) {
+
+}
+
+void Call::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }

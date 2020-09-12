@@ -2,6 +2,7 @@
 #include "Expressions.hpp"
 #include "Statements.hpp"
 #include "Environment.hpp"
+#include "includes/Callable.hpp"
 
 class RuntimeError : std::exception {
 private:
@@ -18,12 +19,14 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
 private:
 	Value m_val;
 	Env_ptr m_env;	//the current environment
+	Env_ptr m_global;	//the global environment of course
 private:
 	bool isNum(const Value& val);
 	bool isNix(const Value& val);
 	bool isStr(const Value& val);
 	bool isBool(const Value& val);
 	bool isTrue(const Value& val);
+	bool isCallable(const Value& val);
 	bool isEqual(const Value& left, const Value& right);
 	bool isEqual(long double left, long double right);
 
@@ -45,6 +48,7 @@ public:
 	virtual void visit(const Variable& var) override;
 	virtual void visit(const Logical& log) override;
 	virtual void visit(const Assign& expr) override;
+	virtual void visit(const Call& expr) override;
 
 	//Statements
 
@@ -54,6 +58,6 @@ public:
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;
 
-	void interpret(const std::vector<Stmt_ptr>& stmts);
+	void interpret(const Stmts& stmts);
 	std::string interpret(Expr_ptr expr);
 };

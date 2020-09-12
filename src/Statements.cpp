@@ -16,7 +16,7 @@ void Print::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
 
-Block::Block(Stmts stmts) : m_stmts(stmts) {
+Block::Block(const Stmts& stmts) : m_stmts(stmts) {
 
 }
 

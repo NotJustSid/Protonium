@@ -18,6 +18,7 @@ class Literal;
 class Variable;
 class Logical;
 class Assign;
+class Call;
 
 class ExprVisitor {
 //! Note that this is just using overloading and no dynamic binding stuff
@@ -29,6 +30,7 @@ public:
 	virtual void visit(const Variable&) = 0;
 	virtual void visit(const Logical&) = 0;
 	virtual void visit(const Assign&) = 0;
+	virtual void visit(const Call&) = 0;
 };
 
 class Expr {
@@ -66,7 +68,9 @@ public:
 	virtual void accept(ExprVisitor* visitor) const override;
 };
 
-using Value = std::variant<std::string, long double, void*, bool>;
+class Callable;
+using Callable_ptr = std::shared_ptr<Callable>;
+using Value = std::variant<std::string, long double, nullptr_t, bool, Callable_ptr>;
 
 class Literal : public Expr {
 public:
@@ -102,6 +106,16 @@ public:
 	Expr_ptr m_val;
 public:
 	Assign(Token name, Token op, Expr_ptr val);
+	virtual void accept(ExprVisitor* visitor) const override;
+};
+
+class Call : public Expr{
+public:
+	Expr_ptr m_callee;
+	Token m_paren;	//rparen to keep track of call line
+	std::vector<Expr_ptr> m_args;
+public:
+	Call(Expr_ptr callee, Token rparen, const std::vector<Expr_ptr>& args);
 	virtual void accept(ExprVisitor* visitor) const override;
 };
 

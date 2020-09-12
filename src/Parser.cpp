@@ -44,7 +44,7 @@ Token Parser::advance() {
 	return previous();
 }
 
-bool Parser::match(std::list<TokenType> types) {
+bool Parser::match(const std::list<TokenType>& types) {
 	for (auto type : types) {
 		if (isNextType(type)) {
 			advance();
@@ -213,7 +213,7 @@ Stmt_ptr Parser::forstmt() {
 Stmt_ptr Parser::exprstmt() {
 	auto expr = expression();
 	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
-	else matchWithErr(TokenType::SEMICOLON, "Expected a ';' after expression.");
+	else matchWithErr(TokenType::SEMICOLON, "Invalid Syntax. Did you miss a ';' after the expression?");
 	return std::make_shared<Expression>(expr);
 }
 
@@ -362,13 +362,38 @@ Expr_ptr Parser::unary() {
 }
 
 Expr_ptr Parser::exponentiation() {
-	auto base = primary();
+	auto base = call();
 	if (match({ TokenType::EXPONENTATION })) {
 		Token op = previous();
 		auto power = exponentiation();
 		base = std::make_shared<Binary>(base, op, power);
 	}
 	return base;
+}
+
+Expr_ptr Parser::call() {
+	Expr_ptr expr = primary();
+
+	while (true) {
+		if (match({ TokenType::LPAREN })) {
+			std::vector<Expr_ptr> args;
+			if (!isNextType(TokenType::RPAREN)) {
+				do {
+					if (args.size() >= 127)
+						Proto::getInstance().error(peek().getLine(), "Cannot have more than 127 arguments.");
+					args.push_back(expression());
+				} 
+				while (match({TokenType::COMMA}));
+			}
+
+			matchWithErr(TokenType::RPAREN, "Expected a ')' after function arguments.");
+			auto paren = previous();
+			expr = std::make_shared<Call>(expr, paren, args);
+		}
+		else break;
+	}
+
+	return expr;
 }
 
 Expr_ptr Parser::primary() {
@@ -386,5 +411,5 @@ Expr_ptr Parser::primary() {
 		return std::make_shared<Variable>(previous());
 	}
 
-	throw error(peek(), "Expected an expression.");
+	throw error(peek(), "Invalid Syntax.");
 }

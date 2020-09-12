@@ -13,12 +13,12 @@ Value& Environment::get(Token name) {
 	throw RuntimeError(name, "Undefined variable '" + name.str() + "'.");
 }
 
-bool Environment::isDefined(std::string name) const {
+bool Environment::isDefined(const std::string& name) const {
 	return m_vars.contains(name);
 }
 
-void Environment::assign(Token name, Value val) {
-	m_vars[name.str()] = val;
+void Environment::assign(const std::string& name, Value val) {
+	m_vars[name] = val;
 }
 
 void Environment::strictAssign(Token name, Value val) {

@@ -44,7 +44,7 @@ private:
 	Token advance(); //! Consume the next token
 	
 	//! Consume the next token if it matches any type of types
-	bool match(std::list<TokenType> types);
+	bool match(const std::list<TokenType>& types);
 	
 	ParseError error(Token t, std::string_view msg);
 
@@ -74,6 +74,7 @@ private:
 	Expr_ptr product();
 	Expr_ptr unary();
 	Expr_ptr exponentiation();
+	Expr_ptr call();
 	Expr_ptr primary();
 };
 

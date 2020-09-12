@@ -1,4 +1,5 @@
 #include "includes/Interpreter.hpp"
+#include "includes/ForeignFuncs.hpp"
 #include "proto.hpp"
 
 RuntimeError::RuntimeError(Token t, std::string err) : m_error(err), m_tok(t) {
@@ -14,8 +15,12 @@ Token RuntimeError::getToken() const {
 }
 
 Interpreter::Interpreter() {
-	m_env = std::make_shared<Environment>();
+	m_global = std::make_shared<Environment>();
+	m_env = m_global;
 	m_val = nullptr;
+
+	Value readfunc = std::make_shared<Read>();
+	m_global->assign("read", readfunc);
 }
 
 bool Interpreter::isNum(const Value& val) {
@@ -23,7 +28,7 @@ bool Interpreter::isNum(const Value& val) {
 }
 
 bool Interpreter::isNix(const Value& val) {
-	return std::holds_alternative<void*>(val);
+	return std::holds_alternative<nullptr_t>(val);
 }
 
 bool Interpreter::isStr(const Value& val) {
@@ -45,6 +50,10 @@ bool Interpreter::isTrue(const Value& val) {
 		return false;
 	}
 	return true;
+}
+
+bool Interpreter::isCallable(const Value& val) {
+	return std::holds_alternative<Callable_ptr>(val);
 }
 
 bool Interpreter::isEqual(const Value& left, const Value& right) {
@@ -70,6 +79,9 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 	}
 	if (isBool(value)) {
 		return std::get<bool>(value) ? "true" : "false";
+	}
+	if (isCallable(value)) {
+		return std::get<Callable_ptr>(value)->info();
 	}
 }
 
@@ -236,11 +248,35 @@ void Interpreter::visit(const Assign& expr) {
 	expr.m_val->accept(this);
 
 	if (expr.m_op.getType() == TokenType::EQUAL) {
-		m_env->assign(expr.m_name, m_val);
+		m_env->assign(expr.m_name.str(), m_val);
 	}
 	else if (expr.m_op.getType() == TokenType::BT_EQUAL) {
 		m_env->strictAssign(expr.m_name, m_val);
 	}
+}
+
+void Interpreter::visit(const Call& expr) {
+	expr.m_callee->accept(this);
+	auto callee = m_val;
+
+	std::vector<Value> args;
+	for (auto arg : expr.m_args) {
+		arg->accept(this);
+		args.push_back(m_val);
+	}
+
+	if (!isCallable(callee)) {
+		throw RuntimeError(expr.m_paren, "Provided object is not callable.");
+	}
+
+	auto fn = std::get<Callable_ptr>(callee);
+	if (fn->arity() != args.size()) {
+		std::string err = "Expected" + std::to_string(fn->arity()) + "arguments but got " + std::to_string(args.size()) + " arguments.";
+
+		throw RuntimeError(expr.m_paren, err);
+	}
+
+	m_val = fn->call(args);
 }
 
 
@@ -300,7 +336,7 @@ void Interpreter::executeBlock(Stmts stmts, Env_ptr env)
 	}
 }
 
-void Interpreter::interpret(const std::vector<Stmt_ptr>& stmts) {
+void Interpreter::interpret(const Stmts& stmts) {
 	try {
 		for (auto& stmt : stmts) {
 			execute(stmt);

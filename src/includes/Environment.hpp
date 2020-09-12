@@ -14,11 +14,9 @@ private:
 	Env_ptr m_parent; //enclosing scope
 public:
 	Value& get(Token name);
-	bool isDefined(std::string name) const;
-	void assign(Token name, Value val);
+	bool isDefined(const std::string& name) const;
+	void assign(const std::string& name, Value val);
 	void strictAssign(Token name, Value val);
-	//! Global scope
 	Environment();
-	//! Local scope
 	Environment(Env_ptr env);
 };

@@ -44,7 +44,7 @@ class Block : public Stmt {
 public:
 	Stmts m_stmts;
 public:
-	Block(Stmts stmts);
+	Block(const Stmts& stmts);
 	virtual void accept(StmtVisitor* visitor) const override;
 };
 
