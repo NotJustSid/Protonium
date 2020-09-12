@@ -97,6 +97,9 @@ void Parser::sync() {
 
 Stmt_ptr Parser::statement() {
 	try {
+		if (match({ TokenType::FUNCTION })) {
+			return fndefn();
+		}
 		if (match({ TokenType::LBRACE })) {
 			return std::make_shared<Block>(block());
 		}
@@ -205,6 +208,26 @@ Stmt_ptr Parser::exprstmt() {
 	if (m_allowExpr && isAtEnd()) m_foundExpr = true;
 	else matchWithErr(TokenType::SEMICOLON, "Invalid Syntax. Did you miss a ';' after the expression?");
 	return std::make_shared<Expression>(expr);
+}
+
+Stmt_ptr Parser::fndefn() {
+	matchWithErr(TokenType::IDENTIFIER, "A function name was expected.");
+	auto name = previous();
+	std::vector<Token> params;
+	matchWithErr(TokenType::LPAREN, "Expected a '(' after function name in definition.");
+	if (!isNextType(TokenType::RPAREN)) {
+		do {
+			if (params.size() >= 127)
+				Proto::getInstance().error(peek().getLine(), "Cannot have more than 127 parameters in a function.");
+			matchWithErr(TokenType::IDENTIFIER, "Expected a parameter name after.");
+			params.push_back(previous());
+		} 
+		while (match({ TokenType::COMMA }));
+	}
+
+	matchWithErr(TokenType::RPAREN, "Expected a ')' after function arguments.");
+	matchWithErr(TokenType::LBRACE, "Expected a '{' before function body.");
+	return std::make_shared<Func>(name, params, block());
 }
 
 Expr_ptr Parser::expression() {

@@ -30,7 +30,7 @@ bool requireNewLine(const std::string& code) {
         }
     }
 
-    return count == 0 && withinQuotes;
+    return count != 0 || withinQuotes;
 }
 
 void repl(Proto& proto) {

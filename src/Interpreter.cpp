@@ -21,8 +21,10 @@ Interpreter::Interpreter() {
 
 	Value readfunc = std::make_shared<Read>();
 	Value printfunc = std::make_shared<Print>();
+	Value printlnfunc = std::make_shared<Println>();
 	m_global->assign("read", readfunc);
 	m_global->assign("print", printfunc);
+	m_global->assign("println", printlnfunc);
 }
 
 bool Interpreter::isNum(const Value& val) {
@@ -307,6 +309,11 @@ void Interpreter::visit(const While& whilestmt) {
 		execute(whilestmt.m_body);
 		whilestmt.m_condition->accept(this);
 	}
+}
+
+void Interpreter::visit(const Func& func) {
+	auto fn = std::make_shared<ProtoFunction>(func.m_name, func.m_params, func.m_body);
+	m_env->assign(func.m_name.str(), fn);
 }
 
 void Interpreter::execute(Stmt_ptr stmt) {

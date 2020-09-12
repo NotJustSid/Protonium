@@ -5,6 +5,7 @@ class Expression;
 class Block;
 class If;
 class While;
+class Func;
 
 class StmtVisitor {
 public:
@@ -12,6 +13,7 @@ public:
 	virtual void visit(const Block&) = 0;
 	virtual void visit(const If&) = 0;
 	virtual void visit(const While&) = 0;
+	virtual void visit(const Func&) = 0;
 };
 
 class Stmt {
@@ -54,5 +56,15 @@ public:
 	Stmt_ptr m_body;
 public:
 	While(Expr_ptr condition, Stmt_ptr body);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class Func : public Stmt {
+public:
+	Token m_name;
+	std::vector<Token> m_params;
+	Stmts m_body;
+public:
+	Func(Token name, const std::vector<Token>& params, const Stmts& body);
 	virtual void accept(StmtVisitor* visitor) const override;
 };

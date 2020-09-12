@@ -31,3 +31,11 @@ While::While(Expr_ptr condition, Stmt_ptr body) : m_condition(condition), m_body
 void While::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Func::Func(Token name, const std::vector<Token>& params, const Stmts& body) : m_name(name), m_params(params), m_body(body) {
+
+}
+
+void Func::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}

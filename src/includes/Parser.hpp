@@ -61,6 +61,7 @@ private:
 	Stmt_ptr whilestmt();
 	Stmt_ptr forstmt();
 	Stmt_ptr exprstmt();
+	Stmt_ptr fndefn();
 
 
 	Expr_ptr expression();

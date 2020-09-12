@@ -31,3 +31,17 @@ public:
 		return nullptr;
 	}
 };
+
+class Println : public Callable {
+public:
+	virtual int arity() override {
+		return 1;
+	}
+	virtual std::string info() {
+		return "<Proto::generic::foreignfn println : (<printable-type>) -> ()>";
+	}
+	virtual Value call(const Values& args) override {
+		std::cout << std::setprecision(maxPrecision) << Interpreter::getInstance().stringify(args.at(0)) << '\n';
+		return nullptr;
+	}
+};

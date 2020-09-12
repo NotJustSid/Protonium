@@ -2,7 +2,8 @@
 #include "Expressions.hpp"
 #include "Statements.hpp"
 #include "Environment.hpp"
-#include "includes/Callable.hpp"
+#include "Callable.hpp"
+#include "ProtoFunc.hpp"
 
 class RuntimeError : std::exception {
 private:
@@ -34,6 +35,7 @@ private:
 	void executeBlock(Stmts stmts, Env_ptr env);
 
 	Interpreter();
+	friend ProtoFunction;
 public:
 	static Interpreter& getInstance();
 	std::string stringify(const Value& value, const char* strContainer = "");
@@ -55,6 +57,7 @@ public:
 	virtual void visit(const Block& block) override;
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;
+	virtual void visit(const Func& func) override;
 
 	void interpret(const Stmts& stmts);
 	std::string interpret(Expr_ptr expr);
