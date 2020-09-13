@@ -62,6 +62,7 @@ private:
 	Stmt_ptr forstmt();
 	Stmt_ptr exprstmt();
 	Stmt_ptr fndefn();
+	Stmt_ptr returnstmt();
 
 
 	Expr_ptr expression();

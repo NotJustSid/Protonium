@@ -1,5 +1,6 @@
 #include "includes/Interpreter.hpp"
 #include "includes/ForeignFuncs.hpp"
+#include "includes/ReturnThrow.hpp"
 #include "proto.hpp"
 
 RuntimeError::RuntimeError(Token t, std::string err) : m_error(err), m_tok(t) {
@@ -275,7 +276,7 @@ void Interpreter::visit(const Call& expr) {
 
 	auto fn = std::get<Callable_ptr>(callee);
 	if (fn->arity() != args.size()) {
-		std::string err = "Expected" + std::to_string(fn->arity()) + "arguments but got " + std::to_string(args.size()) + " arguments.";
+		std::string err = "Expected " + std::to_string(fn->arity()) + " arguments but got " + std::to_string(args.size()) + " arguments.";
 
 		throw RuntimeError(expr.m_paren, err);
 	}
@@ -316,12 +317,19 @@ void Interpreter::visit(const Func& func) {
 	m_env->assign(func.m_name.str(), fn);
 }
 
+void Interpreter::visit(const Return& stmt) {
+	if (stmt.m_val != nullptr) {
+		stmt.m_val->accept(this);
+	}
+	else m_val = nullptr;
+	throw ReturnThrow(m_val);
+}
+
 void Interpreter::execute(Stmt_ptr stmt) {
 	stmt->accept(this);
 }
 
-void Interpreter::executeBlock(Stmts stmts, Env_ptr env)
-{
+void Interpreter::executeBlock(Stmts stmts, Env_ptr env) {
 	Env_ptr parent = m_env;
 	
 	try {
@@ -336,6 +344,12 @@ void Interpreter::executeBlock(Stmts stmts, Env_ptr env)
 	catch (const RuntimeError& err) {
 		m_env = parent;
 		Proto::getInstance().runtimeError(err);
+	}
+	catch (const ReturnThrow& rtrn) {
+		//! Make sure the environment is reset before undwinding all the 
+		//! way back to the call...
+		m_env = parent;
+		throw rtrn;
 	}
 }
 

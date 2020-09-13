@@ -58,7 +58,7 @@ public:
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;
 	virtual void visit(const Func& func) override;
-
+	virtual void visit(const Return& stmt);
 	void interpret(const Stmts& stmts);
 	std::string interpret(Expr_ptr expr);
 };

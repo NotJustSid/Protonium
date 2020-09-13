@@ -97,6 +97,9 @@ void Parser::sync() {
 
 Stmt_ptr Parser::statement() {
 	try {
+		if (match({ TokenType::RETURN })) {
+			return returnstmt();
+		}
 		if (match({ TokenType::FUNCTION })) {
 			return fndefn();
 		}
@@ -228,6 +231,16 @@ Stmt_ptr Parser::fndefn() {
 	matchWithErr(TokenType::RPAREN, "Expected a ')' after function arguments.");
 	matchWithErr(TokenType::LBRACE, "Expected a '{' before function body.");
 	return std::make_shared<Func>(name, params, block());
+}
+
+Stmt_ptr Parser::returnstmt() {
+	auto keyword = previous();
+	Expr_ptr val{ nullptr };
+	if (!isNextType(TokenType::SEMICOLON)) {
+		val = expression();
+	}
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after return value.");
+	return std::make_shared<Return>(keyword, val);
 }
 
 Expr_ptr Parser::expression() {

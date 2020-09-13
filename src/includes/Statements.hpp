@@ -6,6 +6,7 @@ class Block;
 class If;
 class While;
 class Func;
+class Return;
 
 class StmtVisitor {
 public:
@@ -14,6 +15,7 @@ public:
 	virtual void visit(const If&) = 0;
 	virtual void visit(const While&) = 0;
 	virtual void visit(const Func&) = 0;
+	virtual void visit(const Return&) = 0;
 };
 
 class Stmt {
@@ -66,5 +68,14 @@ public:
 	Stmts m_body;
 public:
 	Func(Token name, const std::vector<Token>& params, const Stmts& body);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class Return : public Stmt {
+public:
+	Token m_keyword; //for error reporting
+	Expr_ptr m_val;
+public:
+	Return(Token keyword, Expr_ptr val);
 	virtual void accept(StmtVisitor* visitor) const override;
 };

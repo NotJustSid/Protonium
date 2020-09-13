@@ -39,3 +39,11 @@ Func::Func(Token name, const std::vector<Token>& params, const Stmts& body) : m_
 void Func::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Return::Return(Token keyword, Expr_ptr val) : m_keyword(keyword), m_val(val) {
+
+}
+
+void Return::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}
