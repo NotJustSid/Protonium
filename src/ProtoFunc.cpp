@@ -2,7 +2,11 @@
 #include "includes/Interpreter.hpp"
 #include "includes/ReturnThrow.hpp"
 
-ProtoFunction::ProtoFunction(Token name, const std::vector<Token>& params, Stmts body) : m_name(name), m_params(params), m_body(body) {
+ProtoFunction::ProtoFunction(Token name, const std::vector<Token>& params, Stmts body) : m_name(name.str()), m_params(params), m_body(body) {
+
+}
+
+ProtoFunction::ProtoFunction(const std::string& name, const std::vector<Token>& params, Stmts body) : m_name(name), m_params(params), m_body(body) {
 
 }
 
@@ -11,7 +15,7 @@ int ProtoFunction::arity() {
 }
 
 std::string ProtoFunction::info() {
-	return "<Proto::generic::userfn " + m_name.str() + ">";
+	return (m_name == "") ? "<Proto::generic::userfn::lambda>" :"<Proto::generic::userfn " + m_name + ">";
 }
 
 Value ProtoFunction::call(const Values& args) {

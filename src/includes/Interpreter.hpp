@@ -50,6 +50,7 @@ public:
 	virtual void visit(const Logical& log) override;
 	virtual void visit(const Assign& expr) override;
 	virtual void visit(const Call& expr) override;
+	virtual void visit(const Lambda& expr) override;
 
 	//Statements
 

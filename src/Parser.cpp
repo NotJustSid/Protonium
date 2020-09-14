@@ -1,6 +1,7 @@
 #include <string_view>
 
 #include "includes/Parser.hpp"
+#include "includes/Lambda.hpp"
 #include "proto.hpp"
 
 Parser::Parser(std::vector<Token>& tokens, bool parseRepl) : m_tokens(tokens), m_current(0), m_allowExpr(parseRepl), m_foundExpr(false){
@@ -37,6 +38,12 @@ Token Parser::previous() {
 bool Parser::isNextType(TokenType type) {
 	if (isAtEnd()) return false;
 	return peek().getType() == type;
+}
+
+bool Parser::isNextNextType(TokenType type) {
+	if (isAtEnd()) return false;
+	if (m_tokens.at(m_current + 1).getType() == TokenType::EOF_) return false;
+	return m_tokens.at(m_current + 1).getType() == type;
 }
 
 Token Parser::advance() { 
@@ -100,7 +107,8 @@ Stmt_ptr Parser::statement() {
 		if (match({ TokenType::RETURN })) {
 			return returnstmt();
 		}
-		if (match({ TokenType::FUNCTION })) {
+		if (isNextType(TokenType::FUNCTION) && isNextNextType(TokenType::IDENTIFIER)) {
+			advance();	//consume the fn
 			return fndefn();
 		}
 		if (match({ TokenType::LBRACE })) {
@@ -222,13 +230,13 @@ Stmt_ptr Parser::fndefn() {
 		do {
 			if (params.size() >= 127)
 				Proto::getInstance().error(peek().getLine(), "Cannot have more than 127 parameters in a function.");
-			matchWithErr(TokenType::IDENTIFIER, "Expected a parameter name after.");
+			matchWithErr(TokenType::IDENTIFIER, "Expected a parameter name after ','.");
 			params.push_back(previous());
 		} 
 		while (match({ TokenType::COMMA }));
 	}
 
-	matchWithErr(TokenType::RPAREN, "Expected a ')' after function arguments.");
+	matchWithErr(TokenType::RPAREN, "Expected a ')' after function parameters.");
 	matchWithErr(TokenType::LBRACE, "Expected a '{' before function body.");
 	return std::make_shared<Func>(name, params, block());
 }
@@ -435,6 +443,24 @@ Expr_ptr Parser::primary() {
 
 	if (match({ TokenType::IDENTIFIER })) {
 		return std::make_shared<Variable>(previous());
+	}
+
+	if (match({ TokenType::FUNCTION })) {
+		//lambda
+		std::vector<Token> params;
+		matchWithErr(TokenType::LPAREN, "Expected a '(' after fn");
+		if (!isNextType(TokenType::RPAREN)) {
+			do {
+				if (params.size() >= 127)
+					Proto::getInstance().error(peek().getLine(), "Cannot have more than 127 parameters in a lambda.");
+				matchWithErr(TokenType::IDENTIFIER, "Expected a parameter name after ','.");
+				params.push_back(previous());
+			} while (match({ TokenType::COMMA }));
+		}
+
+		matchWithErr(TokenType::RPAREN, "Expected a ')' after lambda parameters.");
+		matchWithErr(TokenType::LBRACE, "Expected a '{' before lambda body.");
+		return std::make_shared<Lambda>(params, block());
 	}
 
 	throw error(peek(), "Invalid Syntax.");

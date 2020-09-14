@@ -41,6 +41,7 @@ private:
 	Token peek();
 	Token previous();
 	bool isNextType(TokenType type);
+	bool isNextNextType(TokenType type);
 	Token advance(); //! Consume the next token
 	
 	//! Consume the next token if it matches any type of types

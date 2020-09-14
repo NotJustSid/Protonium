@@ -8,6 +8,7 @@ enum class TokenType {
 
     LPAREN, RPAREN,
     LBRACE, RBRACE,
+    LSQRBRKT, RSQRBRKT,
     COMMA,
     DOT,
     MINUS,

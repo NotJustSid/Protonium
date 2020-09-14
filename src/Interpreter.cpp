@@ -1,6 +1,7 @@
 #include "includes/Interpreter.hpp"
 #include "includes/ForeignFuncs.hpp"
 #include "includes/ReturnThrow.hpp"
+#include "includes/Lambda.hpp"
 #include "proto.hpp"
 
 RuntimeError::RuntimeError(Token t, std::string err) : m_error(err), m_tok(t) {
@@ -282,6 +283,10 @@ void Interpreter::visit(const Call& expr) {
 	}
 
 	m_val = fn->call(args);
+}
+
+void Interpreter::visit(const Lambda& expr) {
+	m_val = std::make_shared<ProtoFunction>("", expr.m_params, expr.m_body);
 }
 
 void Interpreter::visit(const Expression& expr) {
