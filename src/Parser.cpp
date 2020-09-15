@@ -396,13 +396,32 @@ Expr_ptr Parser::unary() {
 }
 
 Expr_ptr Parser::exponentiation() {
-	auto base = call();
+	auto base = index();
 	if (match({ TokenType::EXPONENTATION })) {
 		Token op = previous();
 		auto power = exponentiation();
 		base = std::make_shared<Binary>(base, op, power);
 	}
 	return base;
+}
+
+Expr_ptr Parser::index() {
+	auto expr = call();
+	if (match({ TokenType::LSQRBRKT })) {
+		auto tok = previous();
+		if (match({ TokenType::LSQRBRKT })) {
+			//list indexing
+			auto listIndex = list();
+			expr = std::make_shared<Index>(tok, expr, listIndex, true);
+		}
+		else {
+			auto numIndex = expression();
+			expr = std::make_shared<Index>(tok, expr, numIndex, false);
+		}
+
+		matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after index end.");
+	}
+	return expr;
 }
 
 Expr_ptr Parser::call() {

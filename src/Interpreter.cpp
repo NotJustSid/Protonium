@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "includes/Interpreter.hpp"
 #include "includes/ForeignFuncs.hpp"
 #include "includes/ReturnThrow.hpp"
@@ -323,6 +325,55 @@ void Interpreter::visit(const ListExpr& expr) {
 		}
 	}
 	m_val = std::make_shared<list_t>(values, static_cast<list_t::Type>(type));
+}
+
+void Interpreter::visit(const Index& expr) {
+	expr.m_list->accept(this);
+	
+	if (!isList(m_val)) {
+		throw RuntimeError(expr.m_indexOp, "The index operator can only be used on lists.");
+	}
+
+	auto list = std::get<list_ptr>(m_val);
+
+	expr.m_index->accept(this);
+	auto index = m_val;
+
+	if (expr.m_isIndexList) {
+		auto listIndex = std::get<list_ptr>(index);
+
+		if (listIndex->m_type == list_t::Type::emptyList) {
+			throw RuntimeError(expr.m_indexOp, "Cannot use an empty list as an index.");
+		}
+		if (listIndex->m_type != list_t::Type::numList) {
+			throw RuntimeError(expr.m_indexOp, "The indexing list must contain numbers.");
+		}
+		Values val;
+		for (auto i : listIndex->m_list) {
+			//TODO temp
+			auto num = std::lround(std::get<long double>(i));
+			if (num <= 0) throw RuntimeError(expr.m_indexOp, "Indices can't be negative or zero.");
+
+			if(num > list->m_list.size()) throw RuntimeError(expr.m_indexOp, "One or more of the indices is greater than the length of the list.");
+			
+			//num-1 because indexing is 1-based.
+			val.push_back(list->m_list[num-1]);
+		}
+		m_val = std::make_shared<list_t>(val, list->m_type);
+	}
+	else {
+		if (!isNum(index)) {
+			throw RuntimeError(expr.m_indexOp, "The index must be a list or a number.");
+		}
+		//TODO temp
+		auto i = std::lround(std::get<long double>(index));
+		
+		if (i <= 0) throw RuntimeError(expr.m_indexOp, "Indices can't be negative or zero.");
+
+		if (i > list->m_list.size()) throw RuntimeError(expr.m_indexOp, "The index is greater than the length of the list.");
+
+		m_val = list->m_list[i-1];
+	}
 }
 
 void Interpreter::visit(const Expression& expr) {

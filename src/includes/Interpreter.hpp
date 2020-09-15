@@ -53,6 +53,7 @@ public:
 	virtual void visit(const Call& expr) override;
 	virtual void visit(const Lambda& expr) override;
 	virtual void visit(const ListExpr& expr) override;
+	virtual void visit(const Index& expr) override;
 
 	//Statements
 
