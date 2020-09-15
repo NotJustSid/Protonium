@@ -155,12 +155,12 @@ void Lexer::scanToken(Proto& p) {
     case '}':
         addToken(TokenType::RBRACE);
         break;
-    /*case '[':
+    case '[':
         addToken(TokenType::LSQRBRKT);
         break;
     case ']':
         addToken(TokenType::RSQRBRKT);
-        break;*/
+        break;
     case ',':
         addToken(TokenType::COMMA);
         break;

@@ -78,5 +78,6 @@ private:
 	Expr_ptr exponentiation();
 	Expr_ptr call();
 	Expr_ptr primary();
+	Expr_ptr list();
 };
 

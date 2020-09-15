@@ -28,6 +28,7 @@ private:
 	bool isBool(const Value& val);
 	bool isTrue(const Value& val);
 	bool isCallable(const Value& val);
+	bool isList(const Value& val);
 	bool isEqual(const Value& left, const Value& right);
 	bool isEqual(long double left, long double right);
 
@@ -51,6 +52,7 @@ public:
 	virtual void visit(const Assign& expr) override;
 	virtual void visit(const Call& expr) override;
 	virtual void visit(const Lambda& expr) override;
+	virtual void visit(const ListExpr& expr) override;
 
 	//Statements
 

@@ -463,5 +463,22 @@ Expr_ptr Parser::primary() {
 		return std::make_shared<Lambda>(params, block());
 	}
 
+	if (match({ TokenType::LSQRBRKT })) {
+		return list();
+	}
+
 	throw error(peek(), "Invalid Syntax.");
+}
+
+Expr_ptr Parser::list() {
+	std::vector<Expr_ptr> expressions;
+	if (!isNextType(TokenType::RSQRBRKT)) {
+		do {
+			expressions.push_back(expression());
+		} 
+		while (match({ TokenType::COMMA }));
+	}
+
+	matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after list end.");
+	return std::make_shared<ListExpr>(expressions);
 }

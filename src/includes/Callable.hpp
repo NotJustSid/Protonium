@@ -1,8 +1,6 @@
 #pragma once
 #include "Expressions.hpp"
 
-using Values = std::vector<Value>;
-
 class Callable {
 public:
 	virtual Value call(const Values& args) = 0;

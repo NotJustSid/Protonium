@@ -20,6 +20,7 @@ class Logical;
 class Assign;
 class Call;
 class Lambda;
+class ListExpr;
 
 class ExprVisitor {
 //! Note that this is just using overloading and no dynamic binding stuff
@@ -33,6 +34,7 @@ public:
 	virtual void visit(const Assign&) = 0;
 	virtual void visit(const Call&) = 0;
 	virtual void visit(const Lambda&) = 0;
+	virtual void visit(const ListExpr&) = 0;
 };
 
 class Expr {
@@ -73,7 +75,19 @@ public:
 class Callable;
 using Callable_ptr = std::shared_ptr<Callable>;
 
-using Value = std::variant<std::string, long double, nullptr_t, bool, Callable_ptr>;
+class list_t;
+using list_ptr = std::shared_ptr<list_t>;
+using Value = std::variant<std::string, long double, nullptr_t, bool, Callable_ptr, list_ptr>;
+using Values = std::vector<Value>;
+
+class list_t {
+public:
+	Values m_list;
+public:
+	list_t(const Values& list) : m_list(list) {
+
+	}
+};
 
 class Literal : public Expr {
 public:
@@ -120,6 +134,18 @@ public:
 public:
 	Call(Expr_ptr callee, Token rparen, const std::vector<Expr_ptr>& args);
 	virtual void accept(ExprVisitor* visitor) const override;
+};
+
+class ListExpr : public Expr {
+public:
+	std::vector<Expr_ptr> m_exprs;
+public:
+	ListExpr(const std::vector<Expr_ptr>& exprs) : m_exprs(exprs) {
+
+	}
+	virtual void accept(ExprVisitor* visitor) const override {
+		visitor->visit(*this);
+	}
 };
 
 //! Outdated Tree printer

@@ -62,6 +62,10 @@ bool Interpreter::isCallable(const Value& val) {
 	return std::holds_alternative<Callable_ptr>(val);
 }
 
+bool Interpreter::isList(const Value& val) {
+	return std::holds_alternative<list_ptr>(val);
+}
+
 bool Interpreter::isEqual(const Value& left, const Value& right) {
 	if (isNum(left) && isNum(right)) {
 		return isEqual(std::get<long double>(left), std::get<long double>(right));
@@ -88,6 +92,18 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 	}
 	if (isCallable(value)) {
 		return std::get<Callable_ptr>(value)->info();
+	}
+	if (isList(value)) {
+		auto list = std::get<list_ptr>(value);
+		std::string str = "[";
+		for (auto& val : list->m_list) {
+			str += stringify(val, strContainer);
+			str += ", ";
+		}
+		str.pop_back();
+		str.pop_back();
+		str += "]";
+		return str;
 	}
 }
 
@@ -287,6 +303,15 @@ void Interpreter::visit(const Call& expr) {
 
 void Interpreter::visit(const Lambda& expr) {
 	m_val = std::make_shared<ProtoFunction>("", expr.m_params, expr.m_body);
+}
+
+void Interpreter::visit(const ListExpr& expr) {
+	Values values;
+	for (auto& expr : expr.m_exprs) {
+		expr->accept(this);
+		values.push_back(m_val);
+	}
+	m_val = std::make_shared<list_t>(values);
 }
 
 void Interpreter::visit(const Expression& expr) {
