@@ -9,7 +9,7 @@ public:
 		return 0;
 	}
 	virtual std::string info() override {
-		return "<Proto::generic::foreignfn read : () -> string_t>";
+		return "<Proto::generic::foreignfn read>";
 	}
 	virtual Value call(const Values& args) override {
 		std::string str;
@@ -24,7 +24,7 @@ public:
 		return 1;
 	}
 	virtual std::string info() {
-		return "<Proto::generic::foreignfn print : (<printable-type>) -> ()>";
+		return "<Proto::generic::foreignfn print>";
 	}
 	virtual Value call(const Values& args) override {
 		std::cout << std::setprecision(maxPrecision) << Interpreter::getInstance().stringify(args.at(0));
@@ -38,7 +38,7 @@ public:
 		return 1;
 	}
 	virtual std::string info() {
-		return "<Proto::generic::foreignfn println : (<printable-type>) -> ()>";
+		return "<Proto::generic::foreignfn println>";
 	}
 	virtual Value call(const Values& args) override {
 		std::cout << std::setprecision(maxPrecision) << Interpreter::getInstance().stringify(args.at(0)) << '\n';
