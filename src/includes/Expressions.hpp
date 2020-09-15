@@ -83,8 +83,18 @@ using Values = std::vector<Value>;
 class list_t {
 public:
 	Values m_list;
+	enum class Type : std::size_t {
+		strList = 0,
+		numList,
+		nixList,
+		boolList,
+		fnList,
+		multidimList,
+		emptyList = 999
+	};
+	Type m_type;
 public:
-	list_t(const Values& list) : m_list(list) {
+	list_t(const Values& list, Type type) : m_list(list), m_type(type) {
 
 	}
 };
@@ -139,13 +149,10 @@ public:
 class ListExpr : public Expr {
 public:
 	std::vector<Expr_ptr> m_exprs;
+	Token m_brkt;	//for error reporting
 public:
-	ListExpr(const std::vector<Expr_ptr>& exprs) : m_exprs(exprs) {
-
-	}
-	virtual void accept(ExprVisitor* visitor) const override {
-		visitor->visit(*this);
-	}
+	ListExpr(const std::vector<Expr_ptr>& exprs, Token brkt);
+	virtual void accept(ExprVisitor* visitor) const override;
 };
 
 //! Outdated Tree printer

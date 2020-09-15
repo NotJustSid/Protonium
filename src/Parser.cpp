@@ -471,6 +471,7 @@ Expr_ptr Parser::primary() {
 }
 
 Expr_ptr Parser::list() {
+	auto lsqrbrkt = previous();
 	std::vector<Expr_ptr> expressions;
 	if (!isNextType(TokenType::RSQRBRKT)) {
 		do {
@@ -480,5 +481,5 @@ Expr_ptr Parser::list() {
 	}
 
 	matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after list end.");
-	return std::make_shared<ListExpr>(expressions);
+	return std::make_shared<ListExpr>(expressions, lsqrbrkt);
 }

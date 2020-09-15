@@ -100,8 +100,10 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 			str += stringify(val, strContainer);
 			str += ", ";
 		}
-		str.pop_back();
-		str.pop_back();
+		if (!list->m_list.empty()) {
+			str.pop_back();
+			str.pop_back();
+		}
 		str += "]";
 		return str;
 	}
@@ -307,11 +309,20 @@ void Interpreter::visit(const Lambda& expr) {
 
 void Interpreter::visit(const ListExpr& expr) {
 	Values values;
-	for (auto& expr : expr.m_exprs) {
-		expr->accept(this);
+	std::size_t type = 999; //999 == empty list
+	bool first = true;
+	for (auto& exp : expr.m_exprs) {
+		exp->accept(this);
 		values.push_back(m_val);
+		if (first) {
+			type = m_val.index();
+			first = false;
+		}
+		if (type != m_val.index()) {
+			throw RuntimeError(expr.m_brkt, "Lists are homogenous and can't contain different types.");
+		}
 	}
-	m_val = std::make_shared<list_t>(values);
+	m_val = std::make_shared<list_t>(values, static_cast<list_t::Type>(type));
 }
 
 void Interpreter::visit(const Expression& expr) {

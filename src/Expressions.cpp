@@ -81,3 +81,11 @@ Call::Call(Expr_ptr callee, Token rparen, const std::vector<Expr_ptr>& args) : m
 void Call::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+ListExpr::ListExpr(const std::vector<Expr_ptr>& exprs, Token brkt) : m_exprs(exprs), m_brkt(brkt) {
+
+}
+
+void ListExpr::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}
