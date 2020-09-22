@@ -72,6 +72,21 @@ bool Interpreter::isEqual(const Value& left, const Value& right) {
 	if (isNum(left) && isNum(right)) {
 		return isEqual(std::get<long double>(left), std::get<long double>(right));
 	}
+	if (isList(left) && isList(right)) {
+		auto leftList = std::get<list_ptr>(left)->m_list;
+		auto leftListType = std::get<list_ptr>(left)->m_type;
+
+		auto rightList = std::get<list_ptr>(right)->m_list;
+		auto rightListType = std::get<list_ptr>(right)->m_type;
+
+		if (leftListType != rightListType) return false;
+		if (leftList.size() != rightList.size()) return false;
+
+		for (std::size_t i = 0; i < leftList.size(); i++) {
+			if (!isEqual(leftList[i], rightList[i])) return false;
+		}
+		return true;
+	}
 	return left == right;
 }
 
