@@ -30,6 +30,7 @@ private:
 	std::size_t m_current;
 	bool m_allowExpr;
 	bool m_foundExpr;
+	std::size_t m_loopDepth;
 public:
 	Parser() = delete;
 	Parser(std::vector<Token>& tokens, bool parseRepl = false);
@@ -61,6 +62,7 @@ private:
 	Stmt_ptr ifstmt();
 	Stmt_ptr whilestmt();
 	Stmt_ptr forstmt();
+	Stmt_ptr breakstmt();
 	Stmt_ptr exprstmt();
 	Stmt_ptr fndefn();
 	Stmt_ptr returnstmt();

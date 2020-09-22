@@ -7,6 +7,7 @@ class If;
 class While;
 class Func;
 class Return;
+class Break;
 
 class StmtVisitor {
 public:
@@ -16,6 +17,7 @@ public:
 	virtual void visit(const While&) = 0;
 	virtual void visit(const Func&) = 0;
 	virtual void visit(const Return&) = 0;
+	virtual void visit(const Break&) = 0;
 };
 
 class Stmt {
@@ -77,5 +79,10 @@ public:
 	Expr_ptr m_val;
 public:
 	Return(Token keyword, Expr_ptr val);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class Break : public Stmt {
+public:
 	virtual void accept(StmtVisitor* visitor) const override;
 };

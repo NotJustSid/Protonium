@@ -16,6 +16,8 @@ public:
 	Token getToken() const;
 };
 
+class BreakThrow {};
+
 class Interpreter : public ExprVisitor, public StmtVisitor {
 private:
 	Value m_val;
@@ -62,8 +64,10 @@ public:
 	virtual void visit(const Block& block) override;
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;
+	virtual void visit(const Break& breakstmt) override;
 	virtual void visit(const Func& func) override;
 	virtual void visit(const Return& stmt);
+
 	void interpret(const Stmts& stmts);
 	std::string interpret(Expr_ptr expr);
 };

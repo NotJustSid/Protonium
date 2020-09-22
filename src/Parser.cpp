@@ -4,7 +4,7 @@
 #include "includes/Lambda.hpp"
 #include "proto.hpp"
 
-Parser::Parser(std::vector<Token>& tokens, bool parseRepl) : m_tokens(tokens), m_current(0), m_allowExpr(parseRepl), m_foundExpr(false){
+Parser::Parser(std::vector<Token>& tokens, bool parseRepl) : m_tokens(tokens), m_current(0), m_allowExpr(parseRepl), m_foundExpr(false), m_loopDepth(0){
 
 }
 
@@ -123,6 +123,9 @@ Stmt_ptr Parser::statement() {
 		if (match({ TokenType::FOR })) {
 			return forstmt();
 		}
+		if (match({ TokenType::BREAK })) {
+			return breakstmt();
+		}
 		return exprstmt();
 	}
 	catch (const ParseError&) {
@@ -160,8 +163,9 @@ Stmt_ptr Parser::whilestmt() {
 	auto condition = expression();
 	matchWithErr(TokenType::RPAREN, "Expected a ')' after while condition.");
 
+	m_loopDepth++;
 	auto body = statement();
-
+	m_loopDepth--;
 	return std::make_shared<While>(condition, body);
 }
 
@@ -190,6 +194,7 @@ Stmt_ptr Parser::forstmt() {
 	}
 	matchWithErr(TokenType::RPAREN, "Expected a ')' after for-loop clauses.");
 
+	m_loopDepth++;
 	Stmt_ptr body = statement();
 	
 	//desugarize and make this a while loop
@@ -211,7 +216,16 @@ Stmt_ptr Parser::forstmt() {
 		body = std::make_shared<Block>(stmts);
 	}
 
+	m_loopDepth--;
 	return body;
+}
+
+Stmt_ptr Parser::breakstmt() {
+	if (m_loopDepth == 0) {
+		error(previous(), "Cannot use 'break' outside of a loop.");
+	}
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after 'break'.");
+	return std::make_shared<Break>();
 }
 
 Stmt_ptr Parser::exprstmt() {

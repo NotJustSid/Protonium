@@ -447,10 +447,19 @@ void Interpreter::visit(const If& ifStmt) {
 
 void Interpreter::visit(const While& whilestmt) {
 	whilestmt.m_condition->accept(this);
-	while (isTrue(m_val)) {
-		execute(whilestmt.m_body);
-		whilestmt.m_condition->accept(this);
+	try{
+		while (isTrue(m_val)) {
+			execute(whilestmt.m_body);
+			whilestmt.m_condition->accept(this);
+		}
 	}
+	catch (const BreakThrow&) {
+		//we broke out of the loop
+	}
+}
+
+void Interpreter::visit(const Break& breakstmt) {
+	throw BreakThrow();
 }
 
 void Interpreter::visit(const Func& func) {

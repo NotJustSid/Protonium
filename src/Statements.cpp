@@ -47,3 +47,7 @@ Return::Return(Token keyword, Expr_ptr val) : m_keyword(keyword), m_val(val) {
 void Return::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+void Break::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}
