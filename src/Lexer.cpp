@@ -220,9 +220,10 @@ void Lexer::scanToken(Proto& p) {
         string(p);
         break;
     default:
-        if (isDigit(c) || (c=='.' && isDigit(peek()))) {
+        if (isDigit(c) || (c == '.' && isDigit(peek()))) {
             number(p);
         }
+        else if (c == '.' && isNext('.')) addToken(TokenType::DOT_DOT);
         else if (isAlphaOrUnderscore(c)) {
             identifierOrKeyword();
         }

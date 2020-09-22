@@ -89,3 +89,22 @@ ListExpr::ListExpr(const std::vector<Expr_ptr>& exprs, Token brkt) : m_exprs(exp
 void ListExpr::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+Index::Index(Token indexOp, Expr_ptr list, Expr_ptr index) : m_indexOp(indexOp), m_list(list), m_index(index) {
+}
+
+void Index::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}
+
+RangeExpr::RangeExpr(Expr_ptr first, Expr_ptr end, Token op) : m_first(first), m_end(end), m_op(op) {
+	m_step = nullptr;
+}
+
+RangeExpr::RangeExpr(Expr_ptr first, Expr_ptr sep, Expr_ptr end, Token op) : m_first(first), m_step(sep), m_end(end), m_op(op) {
+
+}
+
+void RangeExpr::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}

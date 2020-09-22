@@ -72,6 +72,7 @@ private:
 	Expr_ptr land();
 	Expr_ptr equality();
 	Expr_ptr comparision();
+	Expr_ptr range();
 	Expr_ptr addition();
 	Expr_ptr product();
 	Expr_ptr unary();

@@ -54,6 +54,7 @@ public:
 	virtual void visit(const Lambda& expr) override;
 	virtual void visit(const ListExpr& expr) override;
 	virtual void visit(const Index& expr) override;
+	virtual void visit(const RangeExpr& expr) override;
 
 	//Statements
 

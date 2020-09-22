@@ -350,12 +350,29 @@ Expr_ptr Parser::equality() {
 }
 
 Expr_ptr Parser::comparision() {
-	auto expr = addition();
+	auto expr = range();
 
 	while (match({ TokenType::GREATER, TokenType::GT_EQUAL, TokenType::LESS, TokenType::LT_EQUAL })) {
 		Token op = previous();
-		auto right = addition();
+		auto right = range();
 		expr = std::make_shared<Binary>(expr, op, right);
+	}
+
+	return expr;
+}
+
+Expr_ptr Parser::range() {
+	auto expr = addition();
+	if (match({ TokenType::DOT_DOT })) {
+		Token op = previous();
+		auto expr2 = addition();
+		if (match({ TokenType::DOT_DOT })) {
+			auto expr3 = addition();
+			expr = std::make_shared<RangeExpr>(expr, expr2, expr3, op);
+		}
+		else {
+			expr = std::make_shared<RangeExpr>(expr, expr2, op);
+		}
 	}
 
 	return expr;
@@ -412,11 +429,12 @@ Expr_ptr Parser::index() {
 		if (match({ TokenType::LSQRBRKT })) {
 			//list indexing
 			auto listIndex = list();
-			expr = std::make_shared<Index>(tok, expr, listIndex, true);
+			expr = std::make_shared<Index>(tok, expr, listIndex);
 		}
 		else {
-			auto numIndex = expression();
-			expr = std::make_shared<Index>(tok, expr, numIndex, false);
+			auto index = expression(); 
+			//can be a number or a range (which turns to a list)
+			expr = std::make_shared<Index>(tok, expr, index);
 		}
 
 		matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after index end.");
@@ -426,7 +444,6 @@ Expr_ptr Parser::index() {
 
 Expr_ptr Parser::call() {
 	Expr_ptr expr = primary();
-
 	while (true) {
 		if (match({ TokenType::LPAREN })) {
 			std::vector<Expr_ptr> args;

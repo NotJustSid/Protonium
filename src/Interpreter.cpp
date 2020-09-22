@@ -354,7 +354,7 @@ void Interpreter::visit(const Index& expr) {
 	expr.m_index->accept(this);
 	auto index = m_val;
 
-	if (expr.m_isIndexList) {
+	if (isList(index)) {
 		auto listIndex = std::get<list_ptr>(index);
 
 		if (listIndex->m_type == list_t::Type::emptyList) {
@@ -389,6 +389,40 @@ void Interpreter::visit(const Index& expr) {
 
 		m_val = list->m_list[i-1];
 	}
+}
+
+void Interpreter::visit(const RangeExpr& expr) {
+	expr.m_first->accept(this);
+	if (!isNum(m_val)) {
+		throw RuntimeError(expr.m_op, "Ranges can only contain numeric descriptors.");
+	}
+	long double first = std::get<long double>(m_val);
+
+	long double step = 1;
+	if (expr.m_step != nullptr) {
+		expr.m_step->accept(this);
+		if (!isNum(m_val)) {
+			throw RuntimeError(expr.m_op, "Ranges can only contain numeric descriptors.");
+		}
+		step = std::get<long double>(m_val);
+		if (isEqual(step, 0)) {
+			throw RuntimeError(expr.m_op, "Range step cannot be 0.");
+		}
+	}
+
+	expr.m_end->accept(this);
+	if (!isNum(m_val)) {
+		throw RuntimeError(expr.m_op, "Ranges can only contain numeric descriptors.");
+	}
+	long double end = std::get<long double>(m_val);
+
+	Values rangeList;
+
+	for (auto i = first; i <= end; i += step) {
+		rangeList.push_back(i);
+	}
+
+	m_val = std::make_shared<list_t>(rangeList, list_t::Type::numList);
 }
 
 void Interpreter::visit(const Expression& expr) {

@@ -11,6 +11,7 @@ enum class TokenType {
     LSQRBRKT, RSQRBRKT,
     COMMA,
     DOT,
+    DOT_DOT,
     MINUS,
     PLUS,
     PRODUCT,
