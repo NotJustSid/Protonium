@@ -47,6 +47,7 @@ private:
 	
 	//! Consume the next token if it matches any type of types
 	bool match(const std::list<TokenType>& types);
+	bool match(TokenType type);
 	
 	ParseError error(Token t, std::string_view msg);
 

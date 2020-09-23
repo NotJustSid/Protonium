@@ -62,6 +62,14 @@ bool Parser::match(const std::list<TokenType>& types) {
 	return false;
 }
 
+bool Parser::match(TokenType type) {
+	if (isNextType(type)) {
+		advance();
+		return true;
+	}
+	return false;
+}
+
 ParseError Parser::error(Token t, std::string_view msg){
 	Proto::getInstance().error(t.getLine(), msg);
 	return ParseError{ msg };
@@ -104,26 +112,26 @@ void Parser::sync() {
 
 Stmt_ptr Parser::statement() {
 	try {
-		if (match({ TokenType::RETURN })) {
+		if (match( TokenType::RETURN )) {
 			return returnstmt();
 		}
 		if (isNextType(TokenType::FUNCTION) && isNextNextType(TokenType::IDENTIFIER)) {
 			advance();	//consume the fn
 			return fndefn();
 		}
-		if (match({ TokenType::LBRACE })) {
+		if (match(TokenType::LBRACE)) {
 			return std::make_shared<Block>(block());
 		}
-		if (match({ TokenType::IF })) {
+		if (match(TokenType::IF)) {
 			return ifstmt();
 		}
-		if (match({ TokenType::WHILE })) {
+		if (match(TokenType::WHILE)) {
 			return whilestmt();
 		}
-		if (match({ TokenType::FOR })) {
+		if (match(TokenType::FOR)) {
 			return forstmt();
 		}
-		if (match({ TokenType::BREAK })) {
+		if (match(TokenType::BREAK)) {
 			return breakstmt();
 		}
 		return exprstmt();
@@ -151,7 +159,7 @@ Stmt_ptr Parser::ifstmt() {
 
 	auto then = statement();
 	Stmt_ptr elseBranch{ nullptr };
-	if (match({ TokenType::ELSE })) {
+	if (match(TokenType::ELSE)) {
 		elseBranch = statement();
 	}
 
@@ -173,7 +181,7 @@ Stmt_ptr Parser::forstmt() {
 	matchWithErr(TokenType::LPAREN, "Expected a '(' after 'for'.");
 	
 	Stmt_ptr init;
-	if (match({ TokenType::SEMICOLON })) {
+	if (match(TokenType::SEMICOLON)) {
 		init = nullptr;
 	}
 	else {
@@ -247,7 +255,7 @@ Stmt_ptr Parser::fndefn() {
 			matchWithErr(TokenType::IDENTIFIER, "Expected a parameter name after ','.");
 			params.push_back(previous());
 		} 
-		while (match({ TokenType::COMMA }));
+		while (match(TokenType::COMMA));
 	}
 
 	matchWithErr(TokenType::RPAREN, "Expected a ')' after function parameters.");
@@ -331,7 +339,7 @@ Expr_ptr Parser::assignment() {
 Expr_ptr Parser::lor() {
 	auto expr = land();
 
-	while (match({ TokenType::OR })) {
+	while (match(TokenType::OR)) {
 		Token op = previous();
 		auto right = land();
 		expr = std::make_shared<Logical>(expr, op, right);
@@ -343,7 +351,7 @@ Expr_ptr Parser::lor() {
 Expr_ptr Parser::land() {
 	auto expr = equality();
 
-	while (match({ TokenType::AND })) {
+	while (match(TokenType::AND)) {
 		Token op = previous();
 		auto right = equality();
 		expr = std::make_shared<Logical>(expr, op, right);
@@ -377,10 +385,10 @@ Expr_ptr Parser::comparision() {
 
 Expr_ptr Parser::range() {
 	auto expr = addition();
-	if (match({ TokenType::DOT_DOT })) {
+	if (match(TokenType::DOT_DOT)) {
 		Token op = previous();
 		auto expr2 = addition();
-		if (match({ TokenType::DOT_DOT })) {
+		if (match(TokenType::DOT_DOT)) {
 			auto expr3 = addition();
 			expr = std::make_shared<RangeExpr>(expr, expr2, expr3, op);
 		}
@@ -428,7 +436,7 @@ Expr_ptr Parser::unary() {
 
 Expr_ptr Parser::exponentiation() {
 	auto base = index_or_call();
-	if (match({ TokenType::EXPONENTATION })) {
+	if (match(TokenType::EXPONENTATION)) {
 		Token op = previous();
 		auto power = exponentiation();
 		base = std::make_shared<Binary>(base, op, power);
@@ -440,7 +448,7 @@ Expr_ptr Parser::index_or_call() {
 	Expr_ptr expr = primary();
 	while (true) {
 		//indexing
-		if (match({ TokenType::LPAREN })) {
+		if (match(TokenType::LPAREN)) {
 			std::vector<Expr_ptr> args;
 			if (!isNextType(TokenType::RPAREN)) {
 				do {
@@ -448,7 +456,7 @@ Expr_ptr Parser::index_or_call() {
 						Proto::getInstance().error(peek().getLine(), "Cannot have more than 127 arguments.");
 					args.push_back(expression());
 				} 
-				while (match({TokenType::COMMA}));
+				while (match(TokenType::COMMA));
 			}
 
 			matchWithErr(TokenType::RPAREN, "Expected a ')' after function arguments.");
@@ -457,9 +465,9 @@ Expr_ptr Parser::index_or_call() {
 		}
 
 		//call
-		else if (match({ TokenType::LSQRBRKT })) {
+		else if (match(TokenType::LSQRBRKT)) {
 			auto tok = previous();
-			if (match({ TokenType::LSQRBRKT })) {
+			if (match(TokenType::LSQRBRKT)) {
 				//list indexing
 				auto listIndex = list();
 				expr = std::make_shared<Index>(tok, expr, listIndex);
@@ -483,17 +491,17 @@ Expr_ptr Parser::primary() {
 		return std::make_shared<Literal>(previous());
 	}
 
-	if (match({ TokenType::LPAREN })) {
+	if (match(TokenType::LPAREN)) {
 		auto expr = expression();
 		matchWithErr(TokenType::RPAREN, "Expected ')' after expression.");
 		return std::make_shared<ParenGroup>(expr);
 	}
 
-	if (match({ TokenType::IDENTIFIER })) {
+	if (match(TokenType::IDENTIFIER)) {
 		return std::make_shared<Variable>(previous());
 	}
 
-	if (match({ TokenType::FUNCTION })) {
+	if (match(TokenType::FUNCTION)) {
 		//lambda
 		std::vector<Token> params;
 		matchWithErr(TokenType::LPAREN, "Expected a '(' after fn");
@@ -503,7 +511,7 @@ Expr_ptr Parser::primary() {
 					Proto::getInstance().error(peek().getLine(), "Cannot have more than 127 parameters in a lambda.");
 				matchWithErr(TokenType::IDENTIFIER, "Expected a parameter name after ','.");
 				params.push_back(previous());
-			} while (match({ TokenType::COMMA }));
+			} while (match(TokenType::COMMA));
 		}
 
 		matchWithErr(TokenType::RPAREN, "Expected a ')' after lambda parameters.");
@@ -511,7 +519,7 @@ Expr_ptr Parser::primary() {
 		return std::make_shared<Lambda>(params, block());
 	}
 
-	if (match({ TokenType::LSQRBRKT })) {
+	if (match(TokenType::LSQRBRKT)) {
 		return list();
 	}
 
@@ -525,7 +533,7 @@ Expr_ptr Parser::list() {
 		do {
 			expressions.push_back(expression());
 		} 
-		while (match({ TokenType::COMMA }));
+		while (match(TokenType::COMMA));
 	}
 
 	matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after list end.");
