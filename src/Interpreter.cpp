@@ -6,7 +6,7 @@
 #include "includes/Lambda.hpp"
 #include "proto.hpp"
 
-RuntimeError::RuntimeError(Token t, std::string err) : m_error(err), m_tok(t) {
+RuntimeError::RuntimeError(Token t, const std::string& err) : m_error(err), m_tok(t) {
 
 }
 

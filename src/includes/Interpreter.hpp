@@ -11,7 +11,7 @@ private:
 	Token m_tok;
 public:
 	RuntimeError() = delete;
-	RuntimeError(Token t, std::string err);
+	RuntimeError(Token t, const std::string& err);
 	virtual const char* what() const noexcept override;
 	Token getToken() const;
 };
