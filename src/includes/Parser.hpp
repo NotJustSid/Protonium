@@ -79,8 +79,7 @@ private:
 	Expr_ptr product();
 	Expr_ptr unary();
 	Expr_ptr exponentiation();
-	Expr_ptr index();
-	Expr_ptr call();
+	Expr_ptr index_or_call();
 	Expr_ptr primary();
 	Expr_ptr list();
 };

@@ -427,7 +427,7 @@ Expr_ptr Parser::unary() {
 }
 
 Expr_ptr Parser::exponentiation() {
-	auto base = index();
+	auto base = index_or_call();
 	if (match({ TokenType::EXPONENTATION })) {
 		Token op = previous();
 		auto power = exponentiation();
@@ -436,29 +436,10 @@ Expr_ptr Parser::exponentiation() {
 	return base;
 }
 
-Expr_ptr Parser::index() {
-	auto expr = call();
-	if (match({ TokenType::LSQRBRKT })) {
-		auto tok = previous();
-		if (match({ TokenType::LSQRBRKT })) {
-			//list indexing
-			auto listIndex = list();
-			expr = std::make_shared<Index>(tok, expr, listIndex);
-		}
-		else {
-			auto index = expression(); 
-			//can be a number or a range (which turns to a list)
-			expr = std::make_shared<Index>(tok, expr, index);
-		}
-
-		matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after index end.");
-	}
-	return expr;
-}
-
-Expr_ptr Parser::call() {
+Expr_ptr Parser::index_or_call() {
 	Expr_ptr expr = primary();
 	while (true) {
+		//indexing
 		if (match({ TokenType::LPAREN })) {
 			std::vector<Expr_ptr> args;
 			if (!isNextType(TokenType::RPAREN)) {
@@ -473,6 +454,23 @@ Expr_ptr Parser::call() {
 			matchWithErr(TokenType::RPAREN, "Expected a ')' after function arguments.");
 			auto paren = previous();
 			expr = std::make_shared<Call>(expr, paren, args);
+		}
+
+		//call
+		else if (match({ TokenType::LSQRBRKT })) {
+			auto tok = previous();
+			if (match({ TokenType::LSQRBRKT })) {
+				//list indexing
+				auto listIndex = list();
+				expr = std::make_shared<Index>(tok, expr, listIndex);
+			}
+			else {
+				auto index = expression();
+				//can be a number or a range (which turns to a list)
+				expr = std::make_shared<Index>(tok, expr, index);
+			}
+
+			matchWithErr(TokenType::RSQRBRKT, "Expected a ']' after index end.");
 		}
 		else break;
 	}
