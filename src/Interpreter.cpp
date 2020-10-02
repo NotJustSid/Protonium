@@ -36,7 +36,7 @@ bool Interpreter::isNum(const Value& val) {
 }
 
 bool Interpreter::isNix(const Value& val) {
-	return std::holds_alternative<nullptr_t>(val);
+	return std::holds_alternative<std::nullptr_t>(val);
 }
 
 bool Interpreter::isStr(const Value& val) {

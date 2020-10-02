@@ -81,7 +81,7 @@ using Callable_ptr = std::shared_ptr<Callable>;
 
 class list_t;
 using list_ptr = std::shared_ptr<list_t>;
-using Value = std::variant<std::string, long double, nullptr_t, bool, Callable_ptr, list_ptr>;
+using Value = std::variant<std::string, long double, std::nullptr_t, bool, Callable_ptr, list_ptr>;
 using Values = std::vector<Value>;
 
 class list_t {
