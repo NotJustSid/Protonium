@@ -120,7 +120,7 @@ void Lexer::identifierOrKeyword() {
     while (isAlphaNumeric(peek())) advance();
     auto str = m_src.substr(m_start, m_current - m_start);
 
-    if (keywords.contains(str)) {
+    if (keywords.find(str)!=keywords.end()) {
         if (str == "nix") {
             addToken(keywords.at(str), LiteralType::NIX);
             return;

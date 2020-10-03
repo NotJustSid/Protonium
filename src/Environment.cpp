@@ -2,7 +2,7 @@
 #include "includes/Interpreter.hpp"
 
 Value& Environment::get(Token name) {
-	if (m_vars.contains(name.str())) {
+	if (m_vars.find(name.str())!=m_vars.end()) {
 		return m_vars[name.str()];
 	}
 
@@ -14,7 +14,7 @@ Value& Environment::get(Token name) {
 }
 
 bool Environment::isDefined(const std::string& name) const {
-	return m_vars.contains(name);
+	return (m_vars.find(name)!=m_vars.end());
 }
 
 void Environment::assign(const std::string& name, Value val) {
@@ -22,7 +22,7 @@ void Environment::assign(const std::string& name, Value val) {
 }
 
 void Environment::strictAssign(Token name, Value val) {
-	if (m_vars.contains(name.str())) {
+	if (m_vars.find(name.str())!=m_vars.end()) {
 		m_vars[name.str()] = val;
 	}
 	else if (m_parent != nullptr) {
