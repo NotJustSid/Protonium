@@ -4,3 +4,5 @@ bin/
 *.vcxproj.filters
 *.vcxproj.user
 *.sln
+.vscode/
+*.out
