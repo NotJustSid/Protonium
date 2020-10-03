@@ -91,7 +91,7 @@ bool Interpreter::isEqual(const Value& left, const Value& right) {
 }
 
 bool Interpreter::isEqual(long double left, long double right) {
-	return std::fabsl(left - right) < epsilon;
+	return std::fabs(left - right) < epsilon;
 }
 
 std::string Interpreter::stringify(const Value& value, const char* strContainer) {
@@ -177,7 +177,7 @@ void Interpreter::visit(const Binary& bin) {
 		if (!numOperands) {
 			throw RuntimeError(bin.m_op, "Operands must be numbers.");
 		}
-		m_val = std::powl(std::get<long double>(left), std::get<long double>(right));
+		m_val = std::pow(std::get<long double>(left), std::get<long double>(right));
 		return;
 
 		//comparisions
