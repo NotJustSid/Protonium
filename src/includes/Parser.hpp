@@ -7,8 +7,8 @@
 #include <string_view>
 #include <variant>
 
-#include "includes/Expressions.hpp"
-#include "includes/Token.hpp"
+#include "Expressions.hpp"
+#include "Token.hpp"
 #include "Statements.hpp"
 
 class ParseError : std::exception {
