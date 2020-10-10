@@ -26,16 +26,16 @@ void Lexer::addToken(TokenType type, LiteralType ltype) {
                 if (i + 1 < lexeme.length()) {
                     switch (lexeme.at(i + 1)) {
                     case 'n':
-                        lexeme = lexeme.substr(0, i) + '\n' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        lexeme = lexeme.substr(0, i) + '\n' + lexeme.substr(i + 2);
                         break;
                     case 't':
-                        lexeme = lexeme.substr(0, i) + '\t' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        lexeme = lexeme.substr(0, i) + '\t' + lexeme.substr(i + 2);
                         break;
                     case '"':
-                        lexeme = lexeme.substr(0, i) + '"' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        lexeme = lexeme.substr(0, i) + '"' + lexeme.substr(i + 2);
                         break;
                     case '\\':
-                        lexeme = lexeme.substr(0, i) + '\\' + lexeme.substr(i + 2, lexeme.length() - i - 1);
+                        lexeme = lexeme.substr(0, i) + '\\' + lexeme.substr(i + 2);
                         break;
                     }
                 }
