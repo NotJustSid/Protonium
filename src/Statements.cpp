@@ -32,6 +32,14 @@ void While::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
 
+For::For(Stmt_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body) : m_init(init), m_condition(cond), m_increment(increment), m_body(body) {
+
+}
+
+void For::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}
+
 Func::Func(Token name, const std::vector<Token>& params, const Stmts& body) : m_name(name), m_params(params), m_body(body) {
 
 }
@@ -49,5 +57,9 @@ void Return::accept(StmtVisitor* visitor) const {
 }
 
 void Break::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}
+
+void Continue::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }

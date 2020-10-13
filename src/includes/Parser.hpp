@@ -64,6 +64,7 @@ private:
 	Stmt_ptr whilestmt();
 	Stmt_ptr forstmt();
 	Stmt_ptr breakstmt();
+	Stmt_ptr contstmt();
 	Stmt_ptr exprstmt();
 	Stmt_ptr fndefn();
 	Stmt_ptr returnstmt();

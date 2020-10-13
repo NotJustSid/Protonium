@@ -499,7 +499,10 @@ void Interpreter::visit(const While& whilestmt) {
 	whilestmt.m_condition->accept(this);
 	try{
 		while (isTrue(m_val)) {
-			execute(whilestmt.m_body);
+			try {
+				execute(whilestmt.m_body);
+			}
+			catch (const ContinueThrow&){}
 			whilestmt.m_condition->accept(this);
 		}
 	}
@@ -508,8 +511,40 @@ void Interpreter::visit(const While& whilestmt) {
 	}
 }
 
+void Interpreter::visit(const For& forstmt) {
+	Env_ptr parent = m_env;
+	m_env = std::make_shared<Environment>(m_env); //for env
+	
+	if (forstmt.m_init) {
+		execute(forstmt.m_init);
+	}
+	
+	forstmt.m_condition->accept(this);
+	try {
+		while (isTrue(m_val)) {
+			try {
+				execute(forstmt.m_body);
+			}
+			catch (const ContinueThrow&) {}
+			if (forstmt.m_increment) {
+				forstmt.m_increment->accept(this);
+			}
+			forstmt.m_condition->accept(this);
+		}
+	}
+	catch (const BreakThrow&) {
+		//we broke out of the loop
+	}
+
+	m_env = parent;
+}
+
 void Interpreter::visit(const Break& breakstmt) {
 	throw BreakThrow();
+}
+
+void Interpreter::visit(const Continue& contstmt) {
+	throw ContinueThrow();
 }
 
 void Interpreter::visit(const Func& func) {

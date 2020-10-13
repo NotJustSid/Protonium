@@ -5,9 +5,11 @@ class Expression;
 class Block;
 class If;
 class While;
+class For;
+class Break;
+class Continue;
 class Func;
 class Return;
-class Break;
 
 class StmtVisitor {
 public:
@@ -15,9 +17,11 @@ public:
 	virtual void visit(const Block&) = 0;
 	virtual void visit(const If&) = 0;
 	virtual void visit(const While&) = 0;
+	virtual void visit(const For&) = 0;
 	virtual void visit(const Func&) = 0;
 	virtual void visit(const Return&) = 0;
 	virtual void visit(const Break&) = 0;
+	virtual void visit(const Continue&) = 0;
 };
 
 class Stmt {
@@ -63,6 +67,17 @@ public:
 	virtual void accept(StmtVisitor* visitor) const override;
 };
 
+class For : public Stmt {
+public:
+	Stmt_ptr m_init;
+	Expr_ptr m_condition;
+	Expr_ptr m_increment;
+	Stmt_ptr m_body;
+public:
+	For(Stmt_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
 class Func : public Stmt {
 public:
 	Token m_name;
@@ -83,6 +98,11 @@ public:
 };
 
 class Break : public Stmt {
+public:
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class Continue : public Stmt {
 public:
 	virtual void accept(StmtVisitor* visitor) const override;
 };

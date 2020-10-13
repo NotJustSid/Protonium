@@ -42,6 +42,7 @@ enum class TokenType {
     WHILE,
     FOR,
     BREAK,
+    CONTINUE,
     CLASS,
     IF,
     ELSE,
@@ -103,7 +104,8 @@ const std::unordered_map<std::string, TokenType> keywords = {
     {"this", TokenType::THIS},
     {"while", TokenType::WHILE},
     {"return", TokenType::RETURN},
-    {"break", TokenType::BREAK}
+    {"break", TokenType::BREAK},
+    {"continue", TokenType::CONTINUE}
 };
 
 enum class LiteralType {

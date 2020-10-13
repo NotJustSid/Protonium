@@ -197,6 +197,15 @@ void Resolver::visit(const While& stmt) {
 	resolve(stmt.m_body);
 }
 
+void Resolver::visit(const For& stmt) {
+	beginScope();
+	if(stmt.m_init) resolve(stmt.m_init);
+	resolve(stmt.m_condition);
+	if(stmt.m_increment) resolve(stmt.m_increment);
+	resolve(stmt.m_body);
+	endScope();
+}
+
 void Resolver::visit(const Func& f) {
 	define(f.m_name);
 
@@ -215,6 +224,10 @@ void Resolver::visit(const Return& rtrn) {
 }
 
 void Resolver::visit(const Break&) {
+	//nothing to resolve
+}
+
+void Resolver::visit(const Continue&) {
 	//nothing to resolve
 }
 

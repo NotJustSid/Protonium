@@ -134,6 +134,9 @@ Stmt_ptr Parser::statement() {
 		if (match(TokenType::BREAK)) {
 			return breakstmt();
 		}
+		if (match(TokenType::CONTINUE)) {
+			return contstmt();
+		}
 		return exprstmt();
 	}
 	catch (const ParseError&) {
@@ -204,28 +207,11 @@ Stmt_ptr Parser::forstmt() {
 
 	m_loopDepth++;
 	Stmt_ptr body = statement();
-	
-	//desugarize and make this a while loop
-
-	if (increment) {
-		Stmts stmts;
-		stmts.push_back(body);
-		stmts.push_back(std::make_shared<Expression>(increment));
-		body = std::make_shared<Block>(stmts);
-	}
+	m_loopDepth--;
 
 	if (condition == nullptr) condition = std::make_shared<Literal>(Token(TokenType::TRUE, "true", 0, LiteralType::TRUE));
-	body = std::make_shared<While>(condition, body);
 
-	if (init) {
-		Stmts stmts;
-		stmts.push_back(init);
-		stmts.push_back(body);
-		body = std::make_shared<Block>(stmts);
-	}
-
-	m_loopDepth--;
-	return body;
+	return std::make_shared<For>(init, condition, increment, body);
 }
 
 Stmt_ptr Parser::breakstmt() {
@@ -234,6 +220,14 @@ Stmt_ptr Parser::breakstmt() {
 	}
 	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after 'break'.");
 	return std::make_shared<Break>();
+}
+
+Stmt_ptr Parser::contstmt() {
+	if (m_loopDepth == 0) {
+		error(previous(), "Cannot use 'continue' outside of a loop.");
+	}
+	matchWithErr(TokenType::SEMICOLON, "Expected a ';' after 'continue'.");
+	return std::make_shared<Continue>();
 }
 
 Stmt_ptr Parser::exprstmt() {

@@ -17,6 +17,7 @@ public:
 };
 
 class BreakThrow {};
+class ContinueThrow {};
 
 class Interpreter : public ExprVisitor, public StmtVisitor {
 private:
@@ -68,7 +69,9 @@ public:
 	virtual void visit(const Block& block) override;
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;
+	virtual void visit(const For& forstmt) override;
 	virtual void visit(const Break& breakstmt) override;
+	virtual void visit(const Continue& contstmt) override;
 	virtual void visit(const Func& func) override;
 	virtual void visit(const Return& stmt);
 

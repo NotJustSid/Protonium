@@ -55,8 +55,10 @@ public:
 	virtual void visit(const Expression&) override;
 	virtual void visit(const If&) override;
 	virtual void visit(const While&) override;
+	virtual void visit(const For&) override;
 	virtual void visit(const Func&) override;
 	virtual void visit(const Return&) override;
 	virtual void visit(const Break&) override;
+	virtual void visit(const Continue&) override;
 	virtual void visit(const Block& block) override;
 };
