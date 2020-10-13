@@ -113,6 +113,11 @@ void Lexer::number(Proto& p) {
         advance();
         while (isDigit(peek())) advance();
     }
+    if (peek() == 'e' && (isDigit(peekby2()) || peekby2() == '+' || peekby2() == '-')) {
+        advance();
+        if ((peek() == '+' || peek() == '-') && isDigit(peekby2())) advance();
+        while (isDigit(peek())) advance();
+    }
     addToken(TokenType::NUMBER, LiteralType::NUM);
 }
 

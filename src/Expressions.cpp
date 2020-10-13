@@ -1,5 +1,6 @@
 #include "includes/Expressions.hpp"
 #include "includes/Callable.hpp"
+#include "proto.hpp"
 
 Binary::Binary(Expr_ptr l, Token op, Expr_ptr r) : m_left(l), m_op(op), m_right(r) {
 
@@ -28,7 +29,12 @@ void ParenGroup::accept(ExprVisitor* visitor) const {
 Literal::Literal(Token literal) : m_literalType(literal.getlType()) {
 	switch (literal.getlType()) {
 	case LiteralType::NUM:
-		m_val = std::stold(literal.str());
+		try {
+			m_val = std::stold(literal.str());
+		}
+		catch (const std::out_of_range&) {
+			Proto::getInstance().error(literal.getLine(), "Number out of representation range: ", literal.str());
+		}
 		break;
 	case LiteralType::STR:
 		m_val = literal.str();
@@ -42,7 +48,7 @@ Literal::Literal(Token literal) : m_literalType(literal.getlType()) {
 	case LiteralType::FALSE:
 		m_val = false;
 		break;
-	case LiteralType::NONE: throw "ERR: Trying to instantiate a literal with no possible literal value";
+	case LiteralType::NONE: Proto::getInstance().error(literal.getLine(), "Trying to instantiate a literal with no possible literal value: '", literal.str() + '\'');
 	}
 }
 
