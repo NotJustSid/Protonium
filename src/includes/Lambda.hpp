@@ -2,7 +2,7 @@
 #include "Statements.hpp"
 #include "Expressions.hpp"
 
-class Lambda : public Expr{
+class Lambda : public Expr {
 public:
 	std::vector<Token> m_params;
 	Stmts m_body;

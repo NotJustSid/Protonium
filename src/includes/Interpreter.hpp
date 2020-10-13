@@ -23,6 +23,7 @@ private:
 	Value m_val;
 	Env_ptr m_env;	//the current environment
 	Env_ptr m_global;	//the global environment of course
+	std::unordered_map<const Expr*, std::size_t> m_locals;
 private:
 	bool isNum(const Value& val);
 	bool isNix(const Value& val);
@@ -37,11 +38,14 @@ private:
 	void execute(Stmt_ptr stmt);
 	void executeBlock(Stmts stmts, Env_ptr env);
 
+	Value& lookUpVariable(const Expr& e, const Token& t);
+
 	Interpreter();
 	friend ProtoFunction;
 public:
 	static Interpreter& getInstance();
 	std::string stringify(const Value& value, const char* strContainer = "");
+	void resolve(const Expr& expr, std::size_t depth);
 	Interpreter(const Interpreter&) = delete;
 	void operator=(const Interpreter&) = delete;
 	

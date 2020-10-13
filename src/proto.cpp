@@ -6,6 +6,7 @@
 #include "includes/Lexer.hpp"
 #include "includes/Parser.hpp"
 #include "includes/Interpreter.hpp"
+#include "includes/Resolver.hpp"
 
 #include "dep/rang.hpp"
 using namespace rang;
@@ -22,10 +23,19 @@ void Proto::run(std::string src, bool allowExpr) {
     auto parsedOut = parser.parse();
 
     if (hadError()) return; //stop if there was an error
+
+    auto& res = Resolver::getInstance();
+
     if (std::holds_alternative<Stmts>(parsedOut)) {
+        for (auto& stmt : std::get<Stmts>(parsedOut)) {
+            res.resolve(stmt);
+        }
+        if (hadError()) return;
         Interpreter::getInstance().interpret(std::get<Stmts>(parsedOut));
     }
     else {
+        res.resolve(std::get<Expr_ptr>(parsedOut));
+        if (hadError()) return;
         auto result = Interpreter::getInstance().interpret(std::get<Expr_ptr>(parsedOut));
         if (result != "") {
             std::cout << result << '\n';
@@ -74,4 +84,8 @@ void Proto::error(std::size_t line, std::string_view msg, std::string snippet) {
 
 void Proto::runtimeError(const RuntimeError& error) {
     std::cerr << fgB::red << "[RUNTIME ERROR | Line " << error.getToken().getLine() << "]: " << fg::reset << style::dim << error.what() << style::reset << '\n';
+}
+
+void Proto::warn(std::size_t line, const std::string& warning) {
+    std::cerr << fgB::yellow << "[Warning | Line " << line << "]: " << fg::reset << style::dim << warning << style::reset << '\n';
 }

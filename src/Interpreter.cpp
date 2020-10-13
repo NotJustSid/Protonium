@@ -126,6 +126,29 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 	}
 }
 
+Value& Interpreter::lookUpVariable(const Expr& e, const Token& t) {
+	bool tryGlobal = false;
+	std::size_t depth = 0;
+	try {
+		depth = m_locals.at(&e);
+	}
+	catch (const std::out_of_range&) {
+		tryGlobal = true;
+	}
+	
+	if (!tryGlobal) {
+		return m_env->getAt(t, depth);
+	}
+	else {
+		//! Either the variable is global or it doesn't exist.
+		return m_global->get(t);
+	}
+}
+
+void Interpreter::resolve(const Expr& expr, std::size_t depth) {
+	m_locals[&expr] = depth;
+}
+
 Interpreter& Interpreter::getInstance() {
 	static Interpreter i;
 	return i;
@@ -242,7 +265,7 @@ void Interpreter::visit(const Literal& lit) {
 }
 
 void Interpreter::visit(const Variable& var) {
-	m_val = m_env->get(var.m_name);
+	m_val = lookUpVariable(var, var.m_name);
 }
 
 void Interpreter::visit(const Logical& log) {
@@ -288,11 +311,38 @@ void Interpreter::visit(const Logical& log) {
 void Interpreter::visit(const Assign& expr) {
 	expr.m_val->accept(this);
 
-	if (expr.m_op.getType() == TokenType::EQUAL) {
-		m_env->assign(expr.m_name.str(), m_val);
+	bool isStrictAssign = expr.m_op.getType() == TokenType::BT_EQUAL;
+	bool isLazyAssign = expr.m_op.getType() == TokenType::EQUAL;
+	
+	bool tryGlobal = false;
+	std::size_t dist = 0;
+	try {
+		dist = m_locals.at(&expr);
 	}
-	else if (expr.m_op.getType() == TokenType::BT_EQUAL) {
-		m_env->strictAssign(expr.m_name, m_val);
+	catch (const std::out_of_range&) {
+		tryGlobal = true;
+	}
+
+	if (!tryGlobal) {
+		if (isLazyAssign) {
+			m_env->assignAt(expr.m_name.str(), m_val, dist);
+			return;
+		}
+		if (isStrictAssign) {
+			m_env->strictAssignAt(expr.m_name, m_val, dist);
+			return;
+		}
+	}
+	else {
+		//! Global variable, or doesn't exist
+		if (isLazyAssign) {
+			m_global->assign(expr.m_name.str(), m_val);
+			return;
+		}
+		if (isStrictAssign) {
+			m_global->strictAssign(expr.m_name, m_val);
+			return;
+		}
 	}
 }
 
