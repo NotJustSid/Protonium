@@ -202,7 +202,12 @@ void Resolver::visit(const For& stmt) {
 	if(stmt.m_init) resolve(stmt.m_init);
 	resolve(stmt.m_condition);
 	if(stmt.m_increment) resolve(stmt.m_increment);
-	resolve(stmt.m_body);
+	if (auto block = std::dynamic_pointer_cast<Block>(stmt.m_body)) {
+		for (auto& stmt : block->m_stmts) {
+			resolve(stmt);
+		}
+	}
+	else resolve(stmt.m_body);
 	endScope();
 }
 

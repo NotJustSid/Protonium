@@ -523,7 +523,10 @@ void Interpreter::visit(const For& forstmt) {
 	try {
 		while (isTrue(m_val)) {
 			try {
-				execute(forstmt.m_body);
+				if (auto block = std::dynamic_pointer_cast<Block>(forstmt.m_body)) {
+					executeBlock(block->m_stmts, m_env);
+				}
+				else execute(forstmt.m_body);
 			}
 			catch (const ContinueThrow&) {}
 			if (forstmt.m_increment) {
