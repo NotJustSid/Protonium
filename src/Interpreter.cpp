@@ -129,12 +129,11 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 Value& Interpreter::lookUpVariable(const Expr& e, const Token& t) {
 	bool tryGlobal = false;
 	std::size_t depth = 0;
-	try {
-		depth = m_locals.at(&e);
-	}
-	catch (const std::out_of_range&) {
+
+	if (m_locals.find(&e) == m_locals.end()) {
 		tryGlobal = true;
 	}
+	else depth = m_locals.at(&e);
 	
 	if (!tryGlobal) {
 		return m_env->getAt(t, depth);
@@ -316,12 +315,10 @@ void Interpreter::visit(const Assign& expr) {
 	
 	bool tryGlobal = false;
 	std::size_t dist = 0;
-	try {
-		dist = m_locals.at(&expr);
-	}
-	catch (const std::out_of_range&) {
+	if (m_locals.find(&expr) == m_locals.end()) {
 		tryGlobal = true;
 	}
+	else dist = m_locals.at(&expr);
 
 	if (!tryGlobal) {
 		if (isLazyAssign) {
