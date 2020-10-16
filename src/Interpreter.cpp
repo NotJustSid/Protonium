@@ -405,7 +405,8 @@ void Interpreter::visit(const Index& expr) {
 		auto listIndex = std::get<list_ptr>(index);
 
 		if (listIndex->m_type == list_t::Type::emptyList) {
-			throw RuntimeError(expr.m_indexOp, "Cannot use an empty list as an index.");
+			m_val = std::make_shared<list_t>(Values(), list_t::Type::emptyList);
+			return;
 		}
 		if (listIndex->m_type != list_t::Type::numList) {
 			throw RuntimeError(expr.m_indexOp, "The indexing list must contain numbers.");
