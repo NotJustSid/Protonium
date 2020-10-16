@@ -412,9 +412,12 @@ void Interpreter::visit(const Index& expr) {
 			throw RuntimeError(expr.m_indexOp, "The indexing list must contain numbers.");
 		}
 		Values val;
-		for (auto i : listIndex->m_list) {
-			//TODO temp
-			auto num = std::lround(std::get<long double>(i));
+		for (auto& i : listIndex->m_list) {
+			auto d = std::get<long double>(i);
+			if (!(std::fabs(d - std::lround(d) < epsilon))) {
+				throw RuntimeError(expr.m_indexOp, "Indices must be positive, non-zero integers.");
+			}
+			auto num = std::lround(d);
 			if (num <= 0) throw RuntimeError(expr.m_indexOp, "Indices can't be negative or zero.");
 
 			if(num > list->m_list.size()) throw RuntimeError(expr.m_indexOp, "One or more of the indices is greater than the length of the list.");
@@ -428,8 +431,11 @@ void Interpreter::visit(const Index& expr) {
 		if (!isNum(index)) {
 			throw RuntimeError(expr.m_indexOp, "The index must be a list or a number.");
 		}
-		//TODO temp
-		auto i = std::lround(std::get<long double>(index));
+		auto d = std::get<long double>(index);
+		if (!(std::fabs(d - std::lround(d) < epsilon))) {
+			throw RuntimeError(expr.m_indexOp, "Indices must be positive, non-zero integers.");
+		}
+		auto i = std::lround(d);
 		
 		if (i <= 0) throw RuntimeError(expr.m_indexOp, "Indices can't be negative or zero.");
 
