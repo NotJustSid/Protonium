@@ -14,7 +14,9 @@ private:
 	std::vector<std::unordered_map<std::string, VarInfo>> m_scopes;
 	
 	bool inFunction = false;
-	std::size_t rtrnLine = 0;
+	std::size_t rtrnWarnLine = 0;
+
+	bool inControlFlow = false;
 
 private:
 	void beginScope();

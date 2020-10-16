@@ -51,15 +51,15 @@ void Resolver::resolveFunc(const Func& f) {
 		define(param);
 	}
 	for (auto& stmt : f.m_body) {
-		if (rtrnLine) {
-			Proto::getInstance().warn(rtrnLine, "Redundant code after 'return' statement.");
-			rtrnLine = 0;
+		if (rtrnWarnLine) {
+			Proto::getInstance().warn(rtrnWarnLine, "Redundant code after 'return' statement.");
+			rtrnWarnLine = 0;
 		}
 		resolve(stmt);
 	}
 	endScope();
 	inFunction = temp;
-	rtrnLine = 0;
+	rtrnWarnLine = 0;
 }
 
 void Resolver::resolveFunc(const Lambda& f) {
@@ -70,14 +70,15 @@ void Resolver::resolveFunc(const Lambda& f) {
 		define(param);
 	}
 	for (auto& stmt : f.m_body) {
-		if (rtrnLine) {
-			Proto::getInstance().warn(rtrnLine, "Redundant code after 'return' statement.");
+		if (rtrnWarnLine) {
+			Proto::getInstance().warn(rtrnWarnLine, "Redundant code after 'return' statement.");
+			rtrnWarnLine = 0;
 		}
 		resolve(stmt);
 	}
 	endScope();
 	inFunction = temp;
-	rtrnLine = 0;
+	rtrnWarnLine = 0;
 }
 
 bool Resolver::isInCurrentScope(const std::string& name) {
@@ -186,15 +187,22 @@ void Resolver::visit(const Expression& stmt) {
 
 void Resolver::visit(const If& stmt) {
 	resolve(stmt.m_condition);
+
+	auto temp = inControlFlow;
+	inControlFlow = true;
 	resolve(stmt.m_thenBranch);
 	if (stmt.m_elseBranch != nullptr) {
 		resolve(stmt.m_elseBranch);
 	}
+	inControlFlow = temp;
 }
 
 void Resolver::visit(const While& stmt) {
 	resolve(stmt.m_condition);
+	auto temp = inControlFlow;
+	inControlFlow = true;
 	resolve(stmt.m_body);
+	inControlFlow = temp;
 }
 
 void Resolver::visit(const For& stmt) {
@@ -202,12 +210,17 @@ void Resolver::visit(const For& stmt) {
 	if(stmt.m_init) resolve(stmt.m_init);
 	resolve(stmt.m_condition);
 	if(stmt.m_increment) resolve(stmt.m_increment);
+
+	auto temp = inControlFlow;
+	inControlFlow = true;
 	if (auto block = std::dynamic_pointer_cast<Block>(stmt.m_body)) {
 		for (auto& stmt : block->m_stmts) {
 			resolve(stmt);
 		}
 	}
 	else resolve(stmt.m_body);
+	inControlFlow = temp;
+
 	endScope();
 }
 
@@ -225,7 +238,8 @@ void Resolver::visit(const Return& rtrn) {
 	if (rtrn.m_val != nullptr) {
 		resolve(rtrn.m_val);
 	}
-	rtrnLine = rtrn.m_keyword.getLine();
+	if(!inControlFlow)
+		rtrnWarnLine = rtrn.m_keyword.getLine();
 }
 
 void Resolver::visit(const Break&) {
