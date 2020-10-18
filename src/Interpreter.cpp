@@ -124,6 +124,7 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 		str += "]";
 		return str;
 	}
+	else return "";
 }
 
 Value& Interpreter::lookUpVariable(const Expr& e, const Token& t) {
@@ -163,7 +164,7 @@ void Interpreter::verifyIndices(list_ptr list, const Value& index, Token indexOp
 			auto num = std::lround(d);
 			if (num <= 0) throw RuntimeError(indexOp, "Indices can't be negative or zero.");
 
-			if (num > list->m_list.size()) throw RuntimeError(indexOp, "One or more of the indices is greater than the length of the list.");
+			if (static_cast<std::size_t>(num) > list->m_list.size()) throw RuntimeError(indexOp, "One or more of the indices is greater than the length of the list.");
 		}
 	}
 	else if (!isNum(index)) {
@@ -179,7 +180,7 @@ void Interpreter::verifyIndices(list_ptr list, const Value& index, Token indexOp
 		auto num = std::lround(d);
 		if (num <= 0) throw RuntimeError(indexOp, "Indices can't be negative or zero.");
 
-		if (num > list->m_list.size()) throw RuntimeError(indexOp, "One or more of the indices is greater than the length of the list.");
+		if (static_cast<std::size_t>(num) > list->m_list.size()) throw RuntimeError(indexOp, "One or more of the indices is greater than the length of the list.");
 	}
 }
 
