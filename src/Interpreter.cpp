@@ -399,7 +399,7 @@ void Interpreter::visit(const Call& expr) {
 
 	auto fn = std::get<Callable_ptr>(callee);
 	if (fn->arity() != args.size()) {
-		std::string err = "Expected " + std::to_string(fn->arity()) + " arguments but got " + std::to_string(args.size()) + " arguments.";
+		std::string err = "Expected " + std::to_string(fn->arity()) + " argument(s) but got " + std::to_string(args.size()) + " argument(s).";
 
 		throw RuntimeError(expr.m_paren, err);
 	}
