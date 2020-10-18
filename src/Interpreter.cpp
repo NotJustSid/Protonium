@@ -144,6 +144,45 @@ Value& Interpreter::lookUpVariable(const Expr& e, const Token& t) {
 	}
 }
 
+void Interpreter::verifyIndices(list_ptr list, const Value& index, Token indexOp) {
+	if (isList(index)) {
+		auto listIndex = std::get<list_ptr>(index);
+
+		if (listIndex->m_type == list_t::Type::emptyList) return;
+
+		if (listIndex->m_type != list_t::Type::numList)
+			throw RuntimeError(indexOp, "The indexing list must contain numbers.");
+
+		for (auto& i : listIndex->m_list) {
+			auto d = std::get<long double>(i);
+
+			if (!(std::fabs(d - std::lround(d)) < epsilon)) {
+				throw RuntimeError(indexOp, "Indices must be positive, non-zero integers.");
+			}
+
+			auto num = std::lround(d);
+			if (num <= 0) throw RuntimeError(indexOp, "Indices can't be negative or zero.");
+
+			if (num > list->m_list.size()) throw RuntimeError(indexOp, "One or more of the indices is greater than the length of the list.");
+		}
+	}
+	else if (!isNum(index)) {
+		throw RuntimeError(indexOp, "The index must be a list or a number.");
+	}
+	else {
+		auto d = std::get<long double>(index);
+
+		if (!(std::fabs(d - std::lround(d)) < epsilon)) {
+			throw RuntimeError(indexOp, "Indices must be positive, non-zero integers.");
+		}
+
+		auto num = std::lround(d);
+		if (num <= 0) throw RuntimeError(indexOp, "Indices can't be negative or zero.");
+
+		if (num > list->m_list.size()) throw RuntimeError(indexOp, "One or more of the indices is greater than the length of the list.");
+	}
+}
+
 void Interpreter::resolve(const Expr& expr, std::size_t depth) {
 	m_locals[&expr] = depth;
 }
@@ -401,47 +440,20 @@ void Interpreter::visit(const Index& expr) {
 	expr.m_index->accept(this);
 	auto index = m_val;
 
+	verifyIndices(list, index, expr.m_indexOp);
+
 	if (isList(index)) {
 		auto listIndex = std::get<list_ptr>(index);
-
-		if (listIndex->m_type == list_t::Type::emptyList) {
-			m_val = std::make_shared<list_t>(Values(), list_t::Type::emptyList);
-			return;
-		}
-		if (listIndex->m_type != list_t::Type::numList) {
-			throw RuntimeError(expr.m_indexOp, "The indexing list must contain numbers.");
-		}
 		Values val;
 		for (auto& i : listIndex->m_list) {
-			auto d = std::get<long double>(i);
-			if (!(std::fabs(d - std::lround(d) < epsilon))) {
-				throw RuntimeError(expr.m_indexOp, "Indices must be positive, non-zero integers.");
-			}
-			auto num = std::lround(d);
-			if (num <= 0) throw RuntimeError(expr.m_indexOp, "Indices can't be negative or zero.");
-
-			if(num > list->m_list.size()) throw RuntimeError(expr.m_indexOp, "One or more of the indices is greater than the length of the list.");
-			
-			//num-1 because indexing is 1-based.
-			val.push_back(list->m_list[num-1]);
+			auto in = std::lround(std::get<long double>(i));
+			val.push_back(list->m_list[in-1]);
 		}
 		m_val = std::make_shared<list_t>(val, list->m_type);
 	}
-	else {
-		if (!isNum(index)) {
-			throw RuntimeError(expr.m_indexOp, "The index must be a list or a number.");
-		}
-		auto d = std::get<long double>(index);
-		if (!(std::fabs(d - std::lround(d) < epsilon))) {
-			throw RuntimeError(expr.m_indexOp, "Indices must be positive, non-zero integers.");
-		}
-		auto i = std::lround(d);
-		
-		if (i <= 0) throw RuntimeError(expr.m_indexOp, "Indices can't be negative or zero.");
-
-		if (i > list->m_list.size()) throw RuntimeError(expr.m_indexOp, "The index is greater than the length of the list.");
-
-		m_val = list->m_list[i-1];
+	else if(isNum(index)) {
+		auto in = std::lround(std::get<long double>(index));
+		m_val = list->m_list[in-1];
 	}
 }
 
@@ -477,6 +489,49 @@ void Interpreter::visit(const RangeExpr& expr) {
 	}
 
 	m_val = std::make_shared<list_t>(rangeList, list_t::Type::numList);
+}
+
+void Interpreter::visit(const IndexAssign& expr) {
+	expr.m_list->accept(this);
+
+	if (!isList(m_val)) {
+		throw RuntimeError(expr.m_indexOp, "The index operator can only be used on lists.");
+	}
+
+	auto list = std::get<list_ptr>(m_val);
+
+	expr.m_index->accept(this);
+	auto index = m_val;
+	
+	verifyIndices(list, index, expr.m_indexOp);
+
+	expr.m_val->accept(this);
+	auto value = m_val;
+	if (isList(index)) {
+		auto indexList = std::get<list_ptr>(index);
+		if (!isList(value)) throw RuntimeError(expr.m_op, "The value must be a list.");
+		auto valueList = std::get<list_ptr>(value);
+
+		if (indexList->m_list.size() != valueList->m_list.size()) {
+			throw RuntimeError(expr.m_op, "The value list's length must be equal to the number of indices accessed.");
+		}
+		if (indexList->m_type != valueList->m_type) {
+			throw RuntimeError(expr.m_op, "Type mismatch for list assignment.");
+		}
+
+		for (std::size_t i = 0; i < indexList->m_list.size(); i++) {
+			auto index = std::lround(std::get<long double>(indexList->m_list[i]));
+			list->m_list.at(index - 1) = valueList->m_list.at(i);
+		}
+	}
+	else if(isNum(index)) {
+		auto i = std::lround(std::get<long double>(index));
+
+		if (value.index() != list->m_list[1].index()) throw RuntimeError(expr.m_indexOp, "Type mismatch for list assignment.");
+
+		list->m_list.at(i - 1) = value;
+	}
+
 }
 
 void Interpreter::visit(const Expression& expr) {

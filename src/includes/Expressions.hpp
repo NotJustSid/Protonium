@@ -23,6 +23,7 @@ class Lambda;
 class ListExpr;
 class Index;
 class RangeExpr;
+class IndexAssign;
 
 class ExprVisitor {
 //! Note that this is just using overloading and no dynamic binding stuff
@@ -39,6 +40,7 @@ public:
 	virtual void visit(const ListExpr&) = 0;
 	virtual void visit(const Index&) = 0;
 	virtual void visit(const RangeExpr&) = 0;
+	virtual void visit(const IndexAssign&) = 0;
 };
 
 class Expr {
@@ -180,6 +182,22 @@ public:
 	RangeExpr(Expr_ptr first, Expr_ptr end, Token op);
 	RangeExpr(Expr_ptr first, Expr_ptr sep, Expr_ptr end, Token op);
 	virtual void accept(ExprVisitor* visitor) const override;
+};
+
+class IndexAssign : public Expr {
+public:
+	Expr_ptr m_list;
+	Expr_ptr m_index;
+	Token m_indexOp;
+	Token m_op;
+	Expr_ptr m_val;
+public:
+	IndexAssign(Expr_ptr list, Expr_ptr index, Token indexOp, Token op, Expr_ptr val) : m_list(list), m_index(index), m_indexOp(indexOp), m_op(op), m_val(val) {
+
+	}
+	virtual void accept(ExprVisitor* visitor) const override {
+		visitor->visit(*this);
+	}
 };
 
 //! Outdated Tree printer

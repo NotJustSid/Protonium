@@ -41,6 +41,8 @@ private:
 
 	Value& lookUpVariable(const Expr& e, const Token& t);
 
+	void verifyIndices(list_ptr list, const Value& index, Token indexOp);
+
 	Interpreter();
 	friend ProtoFunction;
 public:
@@ -62,6 +64,7 @@ public:
 	virtual void visit(const ListExpr& expr) override;
 	virtual void visit(const Index& expr) override;
 	virtual void visit(const RangeExpr& expr) override;
+	virtual void visit(const IndexAssign& expr) override;
 
 	//Statements
 

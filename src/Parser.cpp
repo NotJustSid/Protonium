@@ -283,6 +283,10 @@ Expr_ptr Parser::assignment() {
 			return std::make_shared<Assign>(name, op, val);
 		}
 
+		if (auto index = std::dynamic_pointer_cast<Index>(expr)) {
+			return std::make_shared<IndexAssign>(index->m_list, index->m_index, index->m_indexOp, op, val);
+		}
+
 		error(op, "Invalid assignment location.");
 	}
 
@@ -441,7 +445,7 @@ Expr_ptr Parser::exponentiation() {
 Expr_ptr Parser::index_or_call() {
 	Expr_ptr expr = primary();
 	while (true) {
-		//indexing
+		//call
 		if (match(TokenType::LPAREN)) {
 			std::vector<Expr_ptr> args;
 			if (!isNextType(TokenType::RPAREN)) {
@@ -458,7 +462,7 @@ Expr_ptr Parser::index_or_call() {
 			expr = std::make_shared<Call>(expr, paren, args);
 		}
 
-		//call
+		//indexing
 		else if (match(TokenType::LSQRBRKT)) {
 			auto tok = previous();
 			if (match(TokenType::LSQRBRKT)) {

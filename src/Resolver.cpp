@@ -178,6 +178,12 @@ void Resolver::visit(const Assign& expr) {
 
 }
 
+void Resolver::visit(const IndexAssign& iassign) {
+	resolve(iassign.m_val);
+	resolve(iassign.m_index);
+	resolve(iassign.m_list);
+}
+
 
 // Statements
 

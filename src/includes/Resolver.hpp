@@ -50,8 +50,9 @@ public:
 	virtual void visit(const ListExpr&) override;
 	virtual void visit(const Index&) override;
 	virtual void visit(const RangeExpr&) override;
-	virtual void visit(const Variable& var) override;
-	virtual void visit(const Assign& expr) override;
+	virtual void visit(const Variable&) override;
+	virtual void visit(const Assign&) override;
+	virtual void visit(const IndexAssign&) override;
 
 	// Inherited via StmtVisitor
 	virtual void visit(const Expression&) override;
