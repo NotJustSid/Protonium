@@ -26,9 +26,11 @@ Interpreter::Interpreter() {
 	Value readfunc = std::make_shared<Read>();
 	Value printfunc = std::make_shared<Print>();
 	Value printlnfunc = std::make_shared<Println>();
+	Value copyfunc = std::make_shared<Copy>();
 	m_global->assign("read", readfunc);
 	m_global->assign("print", printfunc);
 	m_global->assign("println", printlnfunc);
+	m_global->assign("copy", copyfunc);
 }
 
 bool Interpreter::isNum(const Value& val) {

@@ -45,3 +45,20 @@ public:
 		return nullptr;
 	}
 };
+
+class Copy : public Callable {
+	virtual int arity() override {
+		return 1;
+	}
+	virtual std::string info() {
+		return "<Proto::generic::foreignfn copy>";
+	}
+	virtual Value call(const Values& args) override {
+		const Value& val = args.at(0);
+		
+		if (!std::holds_alternative<list_ptr>(val)) return val;
+
+		auto& list = std::get<list_ptr>(val);
+		return std::make_shared<list_t>(list->m_list, list->m_type);
+	}
+};
