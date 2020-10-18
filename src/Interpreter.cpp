@@ -114,6 +114,20 @@ std::string Interpreter::stringify(const Value& value, const char* strContainer)
 	}
 	if (isList(value)) {
 		auto list = std::get<list_ptr>(value);
+		if (list->m_list.size() > 50) {
+			std::string str = "[";
+			for (std::size_t i = 0; i < 10; i++) {
+				str += stringify(list->m_list[i], strContainer) + ", ";
+			}
+			str += "..., ";
+			for (std::size_t i = list->m_list.size()-10; i < list->m_list.size(); i++) {
+				str += stringify(list->m_list[i], strContainer) + ", ";
+			}
+			str.pop_back();
+			str.pop_back();
+			str += "]";
+			return str;
+		}
 		std::string str = "[";
 		for (auto& val : list->m_list) {
 			str += stringify(val, strContainer);
