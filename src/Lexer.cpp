@@ -21,7 +21,7 @@ void Lexer::addToken(TokenType type, LiteralType ltype) {
         lexeme = lexeme.substr(1, lexeme.length() - 2);
         
         //! Facilitate escape sequences. Only \n, \t, \" and \\ are supported.
-        for (size_t i = 0; i < lexeme.length(); i++) {
+        for (std::size_t i = 0; i < lexeme.length(); i++) {
             if (lexeme.at(i) == '\\') {
                 if (i + 1 < lexeme.length()) {
                     switch (lexeme.at(i + 1)) {
