@@ -592,7 +592,7 @@ void Interpreter::visit(const For& forstmt) {
 	m_env = std::make_shared<Environment>(m_env); //for env
 	
 	if (forstmt.m_init) {
-		execute(forstmt.m_init);
+		forstmt.m_init->accept(this);
 	}
 	
 	forstmt.m_condition->accept(this);

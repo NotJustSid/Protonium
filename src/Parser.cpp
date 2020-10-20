@@ -183,12 +183,13 @@ Stmt_ptr Parser::whilestmt() {
 Stmt_ptr Parser::forstmt() {
 	matchWithErr(TokenType::LPAREN, "Expected a '(' after 'for'.");
 	
-	Stmt_ptr init;
+	Expr_ptr init;
 	if (match(TokenType::SEMICOLON)) {
 		init = nullptr;
 	}
 	else {
-		init = exprstmt();
+		init = expression();
+		matchWithErr(TokenType::SEMICOLON, "Expected a ';' after for-loop initialization clause.");
 	}
 
 	Expr_ptr condition{ nullptr };

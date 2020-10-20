@@ -32,7 +32,7 @@ void While::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
 
-For::For(Stmt_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body) : m_init(init), m_condition(cond), m_increment(increment), m_body(body) {
+For::For(Expr_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body) : m_init(init), m_condition(cond), m_increment(increment), m_body(body) {
 
 }
 

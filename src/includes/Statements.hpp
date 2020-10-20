@@ -69,12 +69,12 @@ public:
 
 class For : public Stmt {
 public:
-	Stmt_ptr m_init;
+	Expr_ptr m_init;
 	Expr_ptr m_condition;
 	Expr_ptr m_increment;
 	Stmt_ptr m_body;
 public:
-	For(Stmt_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body);
+	For(Expr_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body);
 	virtual void accept(StmtVisitor* visitor) const override;
 };
 
