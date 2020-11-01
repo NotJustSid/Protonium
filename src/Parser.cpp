@@ -189,6 +189,19 @@ Stmt_ptr Parser::forstmt() {
 	}
 	else {
 		init = expression();
+
+		if (auto in = std::dynamic_pointer_cast<InExpr>(init)) {
+			//we have a range based for loop
+
+			//! make sure to consume the right paren
+			matchWithErr(TokenType::RPAREN, "Expected a ')' after the ranged for loop clause.");
+
+			m_loopDepth++;
+			Stmt_ptr body = statement();
+			m_loopDepth--;
+			return std::make_shared<RangedFor>(in, body);
+		}
+
 		matchWithErr(TokenType::SEMICOLON, "Expected a ';' after for-loop initialization clause.");
 	}
 
@@ -330,6 +343,16 @@ Expr_ptr Parser::assignment() {
 		else {
 			error(op, "Invalid assignment location.");
 		}
+	}
+
+	if (match(TokenType::IN)) {
+		Token in = previous();
+		Expr_ptr iterable = assignment();
+		if (auto var = std::dynamic_pointer_cast<Variable>(expr)) {
+			auto name = var->m_name;
+			return std::make_shared<InExpr>(name, in, iterable);
+		}
+		error(in, "Missing identifier for iterating variable.");
 	}
 
 	return expr;

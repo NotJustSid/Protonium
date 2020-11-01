@@ -6,6 +6,7 @@ class Block;
 class If;
 class While;
 class For;
+class RangedFor;
 class Break;
 class Continue;
 class Func;
@@ -18,6 +19,7 @@ public:
 	virtual void visit(const If&) = 0;
 	virtual void visit(const While&) = 0;
 	virtual void visit(const For&) = 0;
+	virtual void visit(const RangedFor&) = 0;
 	virtual void visit(const Func&) = 0;
 	virtual void visit(const Return&) = 0;
 	virtual void visit(const Break&) = 0;
@@ -75,6 +77,15 @@ public:
 	Stmt_ptr m_body;
 public:
 	For(Expr_ptr init, Expr_ptr cond, Expr_ptr increment, Stmt_ptr body);
+	virtual void accept(StmtVisitor* visitor) const override;
+};
+
+class RangedFor : public Stmt {
+public:
+	Expr_ptr m_inexpr;
+	Stmt_ptr m_body;
+public:
+	RangedFor(Expr_ptr inexpr, Stmt_ptr body);
 	virtual void accept(StmtVisitor* visitor) const override;
 };
 

@@ -114,3 +114,19 @@ RangeExpr::RangeExpr(Expr_ptr first, Expr_ptr sep, Expr_ptr end, Token op) : m_f
 void RangeExpr::accept(ExprVisitor* visitor) const {
 	visitor->visit(*this);
 }
+
+InExpr::InExpr(Token name, Token in, Expr_ptr iterable) : m_name(name), m_inKeyword(in), m_iterable(iterable) {
+
+}
+
+void InExpr::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}
+
+IndexAssign::IndexAssign(Expr_ptr list, Expr_ptr index, Token indexOp, Token op, Expr_ptr val) : m_list(list), m_index(index), m_indexOp(indexOp), m_op(op), m_val(val) {
+
+}
+
+void IndexAssign::accept(ExprVisitor* visitor) const {
+	visitor->visit(*this);
+}

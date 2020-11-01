@@ -40,6 +40,14 @@ void For::accept(StmtVisitor* visitor) const {
 	visitor->visit(*this);
 }
 
+RangedFor::RangedFor(Expr_ptr inexpr, Stmt_ptr body) : m_inexpr(inexpr), m_body(body) {
+
+}
+
+void RangedFor::accept(StmtVisitor* visitor) const {
+	visitor->visit(*this);
+}
+
 Func::Func(Token name, const std::vector<Token>& params, const Stmts& body) : m_name(name), m_params(params), m_body(body) {
 
 }

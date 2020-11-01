@@ -551,6 +551,15 @@ void Interpreter::visit(const IndexAssign& expr) {
 
 }
 
+void Interpreter::visit(const InExpr& expr) {
+	//! Resolver deals with the case where this is outside a for loop
+	expr.m_iterable->accept(this);
+
+	if (!isList(m_val)) {
+		throw RuntimeError(expr.m_inKeyword, "The specified object for the in-expression isn't an iterable.");
+	}
+}
+
 void Interpreter::visit(const Expression& expr) {
 	expr.m_expr->accept(this);
 }
@@ -590,7 +599,7 @@ void Interpreter::visit(const While& whilestmt) {
 void Interpreter::visit(const For& forstmt) {
 	Env_ptr parent = m_env;
 	m_env = std::make_shared<Environment>(m_env); //for env
-	
+
 	if (forstmt.m_init) {
 		forstmt.m_init->accept(this);
 	}
@@ -609,6 +618,38 @@ void Interpreter::visit(const For& forstmt) {
 				forstmt.m_increment->accept(this);
 			}
 			forstmt.m_condition->accept(this);
+		}
+	}
+	catch (const BreakThrow&) {
+		//we broke out of the loop
+	}
+
+	m_env = parent;
+}
+
+void Interpreter::visit(const RangedFor& rforstmt) {
+	Env_ptr parent = m_env;
+	m_env = std::make_shared<Environment>(m_env); //for env
+	
+	rforstmt.m_inexpr->accept(this);
+
+	auto iterable = std::get<list_ptr>(m_val)->m_list;
+
+	std::size_t dist = 0;
+	dist = m_locals.at(rforstmt.m_inexpr.get());
+
+	std::string name = std::static_pointer_cast<InExpr>(rforstmt.m_inexpr)->m_name.str();
+
+	try {
+		for (auto element : iterable) {
+			m_env->assignAt(name, element, dist);
+			try {
+				if (auto block = std::dynamic_pointer_cast<Block>(rforstmt.m_body)) {
+					executeBlock(block->m_stmts, m_env);
+				}
+				else execute(rforstmt.m_body);
+			}
+			catch (const ContinueThrow&) {}
 		}
 	}
 	catch (const BreakThrow&) {

@@ -65,6 +65,7 @@ public:
 	virtual void visit(const Index& expr) override;
 	virtual void visit(const RangeExpr& expr) override;
 	virtual void visit(const IndexAssign& expr) override;
+	virtual void visit(const InExpr& expr) override;
 
 	//Statements
 
@@ -73,6 +74,7 @@ public:
 	virtual void visit(const If& ifStmt) override;
 	virtual void visit(const While& whilestmt) override;
 	virtual void visit(const For& forstmt) override;
+	virtual void visit(const RangedFor& rforstmt) override;
 	virtual void visit(const Break& breakstmt) override;
 	virtual void visit(const Continue& contstmt) override;
 	virtual void visit(const Func& func) override;

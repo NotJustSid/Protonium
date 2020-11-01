@@ -230,6 +230,27 @@ void Resolver::visit(const For& stmt) {
 	endScope();
 }
 
+void Resolver::visit(const RangedFor& stmt) {
+	beginScope();
+	auto temp = inRangedFor;
+	inRangedFor = true;
+
+	resolve(stmt.m_inexpr);
+
+	auto temp2 = inControlFlow;
+	inControlFlow = true;
+	if (auto block = std::dynamic_pointer_cast<Block>(stmt.m_body)) {
+		for (auto& stmt : block->m_stmts) {
+			resolve(stmt);
+		}
+	}
+	else resolve(stmt.m_body);
+	inControlFlow = temp2;
+
+	inRangedFor = temp;
+	endScope();
+}
+
 void Resolver::visit(const Func& f) {
 	define(f.m_name);
 
@@ -262,4 +283,15 @@ void Resolver::visit(const Block& block) {
 		resolve(stmt);
 	}
 	endScope();
+}
+
+void Resolver::visit(const InExpr& expr) {
+	if (!inRangedFor) {
+		Proto::getInstance().error(expr.m_inKeyword.getLine(), "Invalid usage of 'in' outside a for-loop context.");
+	}
+	else {
+		resolve(expr.m_iterable);
+		define(expr.m_name);
+		resolveLocal(expr, expr.m_name);
+	}
 }

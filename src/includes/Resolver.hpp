@@ -17,6 +17,7 @@ private:
 	std::size_t rtrnWarnLine = 0;
 
 	bool inControlFlow = false;
+	bool inRangedFor = false;
 
 private:
 	void beginScope();
@@ -53,12 +54,14 @@ public:
 	virtual void visit(const Variable&) override;
 	virtual void visit(const Assign&) override;
 	virtual void visit(const IndexAssign&) override;
+	virtual void visit(const InExpr&) override;
 
 	// Inherited via StmtVisitor
 	virtual void visit(const Expression&) override;
 	virtual void visit(const If&) override;
 	virtual void visit(const While&) override;
 	virtual void visit(const For&) override;
+	virtual void visit(const RangedFor&) override;
 	virtual void visit(const Func&) override;
 	virtual void visit(const Return&) override;
 	virtual void visit(const Break&) override;

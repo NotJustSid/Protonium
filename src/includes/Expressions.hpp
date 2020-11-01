@@ -24,6 +24,7 @@ class ListExpr;
 class Index;
 class RangeExpr;
 class IndexAssign;
+class InExpr;
 
 class ExprVisitor {
 //! Note that this is just using overloading and no dynamic binding stuff
@@ -41,6 +42,7 @@ public:
 	virtual void visit(const Index&) = 0;
 	virtual void visit(const RangeExpr&) = 0;
 	virtual void visit(const IndexAssign&) = 0;
+	virtual void visit(const InExpr&) = 0;
 };
 
 class Expr {
@@ -192,63 +194,19 @@ public:
 	Token m_op;
 	Expr_ptr m_val;
 public:
-	IndexAssign(Expr_ptr list, Expr_ptr index, Token indexOp, Token op, Expr_ptr val) : m_list(list), m_index(index), m_indexOp(indexOp), m_op(op), m_val(val) {
-
-	}
-	virtual void accept(ExprVisitor* visitor) const override {
-		visitor->visit(*this);
-	}
+	IndexAssign(Expr_ptr list, Expr_ptr index, Token indexOp, Token op, Expr_ptr val);
+	virtual void accept(ExprVisitor* visitor) const override;
 };
 
-//! Outdated Tree printer
-
-//class TreePrinter : public ExprVisitor {
-//private:
-//	std::string m_repr;
-//public:
-//	const std::string& tree(const Expr& expr) {
-//		expr.accept(this);
-//		return m_repr;
-//	}
-//	virtual void visit(const Binary& bin) override {
-//		parenthesize(bin.m_op.str(), {bin.m_left.get(), bin.m_right.get()});
-//	}
-//	virtual void visit(const Unary& un) override {
-//		parenthesize(un.m_op.str(), { un.m_right.get() });
-//	}
-//	virtual void visit(const ParenGroup& group) override {
-//		parenthesize("group", { group.m_enclosedExpr.get() });
-//	}
-//	virtual void visit(const Literal& lit) override {
-//		std::stringstream ss;
-//		if (lit.m_literalType == LiteralType::NUM) {
-//			ss << std::get<long double>(lit.m_val);
-//		}
-//		if (lit.m_literalType == LiteralType::STR) {
-//			ss << "\"" << std::get<std::string>(lit.m_val) << "\"";
-//		}
-//		if (lit.m_literalType == LiteralType::NIX) {
-//			ss << "nix";
-//		}
-//		if (lit.m_literalType == LiteralType::TRUE) {
-//			ss << "true";
-//		}
-//		if (lit.m_literalType == LiteralType::FALSE) {
-//			ss << "false";
-//		}
-//		m_repr += ss.str();
-//	}
-//
-//private:
-//	void parenthesize(std::string name, std::vector<Expr*>&& exprs) {
-//		m_repr += "(" + name;
-//		for (auto& expr : exprs) {
-//			m_repr += " ";
-//			expr->accept(this);
-//		}
-//		m_repr += ")";
-//	}
-//};
+class InExpr : public Expr {
+public:
+	Token m_name;
+	Token m_inKeyword;
+	Expr_ptr m_iterable;
+public:
+	InExpr(Token name, Token in, Expr_ptr iterable);
+	virtual void accept(ExprVisitor* visitor) const override;
+};
 
 const auto epsilon = std::numeric_limits<long double>::epsilon();
 const auto maxPrecision = std::numeric_limits<long double>::digits10 + 1;
