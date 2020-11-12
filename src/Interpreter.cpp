@@ -633,7 +633,7 @@ void Interpreter::visit(const RangedFor& rforstmt) {
 	
 	rforstmt.m_inexpr->accept(this);
 
-	auto iterable = std::get<list_ptr>(m_val)->m_list;
+	auto iterable = std::get<list_ptr>(m_val);
 
 	std::size_t dist = 0;
 	dist = m_locals.at(rforstmt.m_inexpr.get());
@@ -641,7 +641,8 @@ void Interpreter::visit(const RangedFor& rforstmt) {
 	std::string name = std::static_pointer_cast<InExpr>(rforstmt.m_inexpr)->m_name.str();
 
 	try {
-		for (auto element : iterable) {
+		for (std::size_t i = 0;i < iterable->m_list.size();i++) {
+			auto element = iterable->m_list[i];
 			m_env->assignAt(name, element, dist);
 			try {
 				if (auto block = std::dynamic_pointer_cast<Block>(rforstmt.m_body)) {
