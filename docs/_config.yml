@@ -1,10 +1,10 @@
 title: Protonium Docs
 description: Documentation for the Protonium Language
-baseurl: "/protonium"
+baseurl: "/Protonium"
 url: "https://sid200.github.io"
 
 # Build settings
-theme: just-the-docs
+remote_theme: pmarsceill/just-the-docs
 # highlighter: none
 # highlight_theme: dark2
 # color_scheme: dark
