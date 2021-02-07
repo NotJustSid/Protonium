@@ -1,0 +1,70 @@
+//Colors
+
+$dark-main: #27292A;
+$dark-side: #2B2E2F;
+$border-color: #464B4E;
+$code-bg: #2B2E2F;
+$table-bg: #323737;
+$search-inp-color: white;
+$hover-bg: #373b3d;
+
+// Scheme definition
+
+$body-background-color: $dark-main;
+$sidebar-color: $dark-side;
+$border-color: $border-color;
+
+$body-text-color: $grey-lt-300;
+$body-heading-color: $grey-lt-000;
+$nav-child-link-color: $grey-dk-000;
+$search-result-preview-color: $grey-dk-000;
+
+$link-color: $blue-000;
+$btn-primary-color: $blue-200;
+$base-button-color: $grey-dk-250;
+
+$code-background-color: $code-bg;
+.highlight, .highlight pre, .highlight table {
+    background-color: $code-bg;
+}
+
+$search-background-color: $dark-main;
+$feedback-color: $hover-bg;
+
+$table-background-color: $table-bg;
+
+
+.search-input {
+    color: $search-inp-color;
+}
+
+table {
+    border-spacing: 0px;
+}
+p > code,
+a > code,
+li > code,
+figcaption > code,
+td > code {
+    margin: 0 2px;
+    padding: 0 5px;
+    font-size: $font-size-3;
+    line-height: 1.5;
+    border: 1px solid lighten(#000, 90);
+    color: whitesmoke !important;
+    background-color: lighten(#000, 25);
+    border-radius: 3px;
+    border-color: #444;
+}
+
+
+::-webkit-scrollbar {
+    background-color: #2f3334;
+    color: #c5beb2;
+}
+::-webkit-scrollbar-corner {
+    background-color: #27292a;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #575d60;
+}

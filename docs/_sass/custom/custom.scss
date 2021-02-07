@@ -1,0 +1,32 @@
+//Shift the sidebar to the left side
+.site-nav, .site-header, .site-footer {
+    width: 100%;
+}
+  
+.side-bar {
+    @include mq(lg) {
+        width: $nav-width;
+    }
+}
+
+.main {
+    max-width: unset;
+    @include mq(lg) {
+        margin-left: $nav-width;
+    }
+}
+
+
+//Increase font size in code blocks
+.highlight, .highlight pre, .highlight table {
+    font-size: ($font-size-6 + $font-size-7)/2;
+}
+
+.search-results-list {
+    margin-bottom: 0;
+}
+
+//A verbatim class
+.verbatim {
+    font-family: $mono-font-family;
+}

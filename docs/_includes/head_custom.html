@@ -1,0 +1,46 @@
+<script>
+	if(window.localStorage.theme) jtd.setTheme(window.localStorage.theme);
+	else jtd.setTheme('light');
+
+	function darkify() {
+		let store = window.localStorage;
+		jtd.setTheme('darker');
+		store.setItem('theme', 'darker');
+	}
+	
+	function lightify() {
+		let store = window.localStorage;
+		jtd.setTheme('light');
+		store.setItem('theme', 'light');
+	}
+
+	jtd.onReady(()=>{
+		jtd.addEvent(document.getElementById('search-input'), 'keydown', ()=>{
+			let results = document.getElementsByClassName('search-result active');
+			
+			Array.from(results).forEach((result)=>{
+				let rect = result.getBoundingClientRect();
+				let elemTop = rect.top;
+				let elemBottom = rect.bottom;
+
+				let isVisible = elemTop < window.innerHeight && elemBottom >= 0;
+			
+				if(!isVisible) result.scrollIntoView();
+			});
+
+		});
+		jtd.addEvent(document.getElementById('search-input'), 'keyup', ()=>{
+			let results = document.getElementsByClassName('search-result active');
+
+			Array.from(results).forEach((result)=>{
+				let rect = result.getBoundingClientRect();
+				let elemTop = rect.top;
+				let elemBottom = rect.bottom;
+
+				let isVisible = elemTop < window.innerHeight && elemBottom >= 0;
+			
+				if(!isVisible) result.scrollIntoView();
+			});
+		});
+	});
+</script>
