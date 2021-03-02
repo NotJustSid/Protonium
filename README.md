@@ -7,10 +7,9 @@
 
 <img src="https://img.shields.io/github/v/release/sid200/protonium?include_prereleases&style=for-the-badge" alt="version"></img>
 
-<!--
-TODO <img src="" alt="website"></img>
--->
-
+<a href="https://sid200.github.io/Protonium/" target="_blank">
+<img src="https://img.shields.io/website?down_message=Offline&label=DOCS&style=for-the-badge&up_message=Online&url=https%3A%2F%2Fsid200.github.io%2FProtonium%2F" alt="docs"></img>
+</a>
 </div>
 </a>
 
